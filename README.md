@@ -1,2 +1,2 @@
 # ma1805-game
-game
+ma1805 game!
