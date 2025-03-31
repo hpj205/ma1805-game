@@ -3,10 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Sketch</title>
 
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+      /* */
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%; /* Full viewport height */
+        overflow: hidden; /* Prevent scrollbars */
+      }
+      
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f0f0f0; /* Optional: visual feedback */
+      }
+      
+      canvas {
+        display: block; /* Removes inline spacing */
+        /* Optional border for visibility during development: */
+        border: 1px solid #333;
+      }
+    </style>
 
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>

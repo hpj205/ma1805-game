@@ -9,7 +9,8 @@ let currentRoom = "mainRoom"; // keeping track of the current room
 let childrenLibrary = false;
 
 function setup() {
-  createCanvas(600, 400);
+  createCanvas(700, 500);
+ 
 
   // player positions
   player = createVector(width / 3, height / 2);
@@ -17,7 +18,7 @@ function setup() {
   // npc positions
   npc = createVector((2 * width) / 3, height / 2); // gardener
   clown = createVector(width / 2, height / 2 + 50); // class clown (in the children's library)
-  student = createVector(width / 2 - 100, height / 2 + 150); // broke student (in the children's library)
+  student = createVector(width / 2 - 100, height / 2 + 150); // chef student (in the children's library)
 
   // define book positions
   book = createVector(width / 2, height / 3); // gardening book (in the main room)
@@ -43,18 +44,18 @@ function draw() {
       rect(book.x, book.y, 20, 20);
     }
   } else if (currentRoom === "childrenLibrary") {
-    // children's library elements: class clown, broke Student, and books
+    // children's library elements: class clown, chef Student, and books
     fill(255, 184, 237);
     ellipse(clown.x, clown.y, 40, 40);
     fill(0);
     textSize(16);
-    text("NPC: Clown", clown.x - 30, clown.y - 30);
+    text("NPC: class clown", clown.x - 30, clown.y - 30);
 
     fill(255, 184, 237);
     ellipse(student.x, student.y, 40, 40);
     fill (0);
     textSize (16);
-    text("NPC: Broke Student", student.x - 30, student.y - 30);
+    text("NPC: chef Student", student.x - 30, student.y - 30);
 
     // books (if not yet collected)
     if (!inventory.includes("Cheap Recipes")) {
@@ -134,14 +135,14 @@ function draw() {
       }
     }  
 
-    // broke student dialogue
+    // chef student dialogue
     if (dist(player.x, player.y, student.x, student.y) < 60) {
       if (selectedOption === "inquire") {
         text("NPC: I borrowed a Cheap Recipes book.", 70, height - 135);
       } else if (selectedOption === "challenge") {
         text("NPC: I borrowed it last week!! >:(", 70, height - 135);
       } else if (selectedOption === "accuse") {
-        text("GUILTY", 70, height - 135);
+        text("GAME OVER", 70, height - 135);
     
       }
     }
@@ -161,7 +162,7 @@ function draw() {
 }
 
 function keyPressed() {
-  let speed = 10;
+  let speed = 20;
   if (key === 'w' || key === 'W') player.y -= speed;
   if (key === 's' || key === 'S') player.y += speed;
   if (key === 'a' || key === 'A') player.x -= speed;
