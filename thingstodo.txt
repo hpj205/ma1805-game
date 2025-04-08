@@ -1,0 +1,15 @@
+
+- add in an evidence array
+    - create an evidence button next to the inventory button
+    - make both buttons look nicer
+    - make inventory/evidence array look nicer as well
+
+- add in desk + librarian npc!
+
+- fix book names + inventory problems
+    - alert user when book/evidence are discovered
+
+- reset game button
+
+
+- begin drawing up the npcs!!
