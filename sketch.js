@@ -1,18 +1,351 @@
-let playerGrid;
-let npc, clown, student;
-let showMenu = false;
-let selectedOption = null; // stores player's dialogue choices
-let inventory = [];
-let showInventory = false;
-let inventoryButton;
-let book, cheapRecipes, inconvenienceBook;
-let bookCollected = false;
-let currentRoom = "mainRoom"; // keeping track of the current room
-let textures = [];
+/* == programmer notes ==
+
+- issue with book collection, gardening book is appearing
+ */
+
+
+
+//GLOBAL VARIABLES
 let tileSize = 50;
 let tilesX = 14;
 let tilesY = 10;
 
+let game;// game obj
+
+let redBookImg, greenBookImg, blueBookImg;
+
+//PRELOAD
+function preload() {
+  Tile.loadTextures();
+  Book.loadImages();
+}
+
+//SET UP
+function setup() {
+  createCanvas(700, 500);
+  game = new Game();
+  game.setup();
+}
+
+//DRAW FUNCTION
+function draw() {
+  background(220);
+  game.update();
+  game.display();
+}
+
+//KEYPRESSED FUNCTION
+function keyPressed() {
+  // if NPC is active and keypressed is 1,2, or 3, dialogue optns
+  if (game.activeNPC && ['1', '2', '3'].includes(key)) {
+    game.activeNPC.handleDialogue(key);// npc dialoge base on key
+    return;// early return, stop key handling
+  }
+
+  game.handleInput(key);// otherwise handle playr input
+}
+
+
+// GAME CLASS
+// manages rooms, player, inventory, NPC interactions
+  class Game {
+    constructor() {
+      this.rooms = {};
+      this.currentRoom = "mainRoom";
+      this.player = new Player(3, 5);
+      this.inventory = [];
+      this.ui = new UI(this);
+      this.activeNPC = null;
+      this.allBooks = []; 
+
+    }
+  
+    setup() {
+      // room map, NPCs, books
+      this.rooms["mainRoom"] = new Room(mainRoomMap, [
+        new NPC("Gardener", 200, 170, ["I'm borrowing a book on gardening.", "I borrowed it last week!! >:("]),
+        new NPC("Librarian", 625, 250, ["Please whisper.", "We *will* throw you out."])
+      ], [
+        new Book("Gardening Book", redBookImg, 410, 170, this)
+      ]);
+  
+      this.rooms["childrenLibrary"] = new Room(childrenLibraryMap, [
+        new NPC("Class Clown", 350, 350, ["I put in a lot of research into being a nuisance.", "I borrowed it last week!! >:("]),
+        new NPC("Chef Student", 500, 120, ["I borrowed a Cheap Recipes book.", "I borrowed it last week!! >:("])
+      ], [
+        new Book("Cheap Recipes", greenBookImg, 250, 170, this),
+        new Book("How to Inconvenience...", blueBookImg, 5 * tileSize + tileSize / 2, 3 * tileSize + tileSize / 2, this),
+      ] );
+       
+      for (let roomName in this.rooms) {
+      this.allBooks.push(...this.rooms[roomName].books);
+}
+
+      this.ui.createInventoryButton();
+
+    }
+  
+
+  update() {
+  
+    this.activeNPC = null; // reset active NPC to null each framae
+    this.currentRoomObj().update(this.player, this.inventory);// update the current rm
+    this.currentRoomObj().npcs.forEach(npc => {
+      npc.checkProximity(this.player);
+      if (npc.active) {
+        this.activeNPC = npc;
+    }
+  })
+
+  }
+
+  display() {
+    this.currentRoomObj().display();
+    this.player.display();
+    this.ui.display();
+  }
+
+  handleInput(k) {
+    // handling player movement n inputs
+    this.player.handleInput(k, this.currentRoomObj());
+    if (k === 'i' || k === 'I') this.ui.toggleInventory();
+
+    // checking for tile change when player enters door (tile 3)
+    let tile = this.currentRoomObj().getTile(this.player.grid);
+    if (tile === 3) {
+      this.currentRoom = this.currentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
+      this.player.setPosition(3, 5);
+    }
+  }
+// helper func to get current rm obj
+  currentRoomObj() {
+    return this.rooms[this.currentRoom];
+  }
+}
+
+// ROOM CLASS 
+//rooms and the sutff in it, maps, npcs, books
+class Room {
+  constructor(map, npcs, books) {
+    this.map = map;
+    this.npcs = npcs;
+    this.books = books;
+  }
+
+  update(player, inventory) {
+    // update npcs (check if theyre close 2 player) and books (check if picked up)
+    this.npcs.forEach(npc => npc.checkProximity(player));
+    this.books.forEach(book => book.checkPickup(player, inventory));
+  }
+
+  display() {
+    // drawing tiles of the room using map layout
+    for (let y = 0; y < tilesY; y++) {
+      for (let x = 0; x < tilesX; x++) {
+        let tileIndex = this.map[y][x];
+        Tile.draw(tileIndex, x, y);
+      }
+    }
+    // display all npcs n books
+    this.npcs.forEach(npc => npc.display());
+    this.books.forEach(book => book.display());
+  }
+// yayyy helper function to get tile at spceific grid pos
+  getTile(grid) {
+    return this.map[grid.y][grid.x];
+  }
+}
+
+
+// PLAYER CLASS
+class Player {
+  constructor(x, y) {
+    this.grid = createVector(x, y);
+  }
+
+  display() {
+    fill(209, 247, 255);//this will be replace with a sprite,,, when we have one
+    ellipse(this.grid.x * tileSize + tileSize / 2, this.grid.y * tileSize + tileSize / 2, 40);
+  }
+
+  handleInput(k, room) {
+    let dx = 0, dy = 0;
+    // WASD movement cuz duhh
+    if (k === 'w' || k === 'W') dy = -1;
+    if (k === 's' || k === 'S') dy = 1;
+    if (k === 'a' || k === 'A') dx = -1;
+    if (k === 'd' || k === 'D') dx = 1;
+
+    //constrainig new pos to be within room boundaries
+    let newX = constrain(this.grid.x + dx, 0, tilesX - 1);
+    let newY = constrain(this.grid.y + dy, 0, tilesY - 1);
+    let tile = room.map[newY][newX];
+
+    // move the player as long as the tile is like walkable on
+    if (tile !== 1 && tile !== 2) {
+      this.grid.set(newX, newY);
+    }
+  }
+// player pos as a vector to display rzns
+  getPos() {
+    return createVector(this.grid.x * tileSize + tileSize / 2, this.grid.y * tileSize + tileSize / 2);
+  }
+
+  setPosition(x, y) {
+    this.grid.set(x, y);
+  }
+}
+
+// NPC CLASS
+class NPC {
+  constructor(name, x, y, dialogues) {
+    this.name = name;
+    this.pos = createVector(x, y);
+    this.dialogues = dialogues;
+    this.active = false;
+    this.lastLine = ""; // store last dialogue line
+  }
+
+  checkProximity(player) {
+    // check if player is within certain distance from the npc
+    this.active = dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 60;
+  }
+
+  display() {
+    //to be replaced with sprites,,, when we have them
+    fill(255, 184, 237);
+    ellipse(this.pos.x, this.pos.y, 40);
+    fill(0);
+    textSize(14);
+    text("NPC: " + this.name, this.pos.x - 30, this.pos.y - 30);
+
+    if (this.active) {
+      fill(255);
+      rect(50, height - 140, 600, 120, 10);
+      fill(0);
+      textSize(14);
+      text("1. Inquire    2. Challenge    3. Accuse", 70, height - 110);
+     // display NPCS last line of dialogue
+      if (this.lastLine) {
+        textSize(16);
+        text(`${this.name}: "${this.lastLine}"`, 70, height - 80);
+      }
+    }
+  }
+// self explanatory...
+  handleDialogue(k) {
+    const idx = parseInt(k) - 1;
+    if (idx >= 0 && idx < this.dialogues.length) {
+      this.lastLine = this.dialogues[idx];
+    } else {
+      this.lastLine = "I don't understand that.";
+    }
+  }
+}
+
+
+// BOOK CLASS
+class Book {
+  constructor(name, img, x, y, game) {
+    this.name = name;
+    this.img = img;
+    this.pos = createVector(x, y);
+    this.collected = false;
+    this.game = game;
+  }
+
+  checkPickup(player, inventory) {
+    if (!this.collected && dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 30) {
+      inventory.push(this.name);
+      this.collected = true;
+      this.game.ui.setMessage(`You picked up "${this.name}"!`);
+    }
+  }
+
+  display() {
+    if (!this.collected) {
+      image(this.img, this.pos.x, this.pos.y, 20, 20);
+    }
+  }
+
+  static loadImages() {
+    redBookImg = loadImage("red-book.png");
+    greenBookImg = loadImage("green-book.png");
+    blueBookImg = loadImage("blue-book.png");
+  }
+}
+
+// TILE CLASS
+// self explanatory. tiles init
+class Tile {
+  static loadTextures() {
+    Tile.textures = [];
+    Tile.textures[0] = loadImage("floor-tile.png");
+    Tile.textures[1] = loadImage("bookshelf.png");
+    Tile.textures[2] = loadImage("brown-wall-tile.png");
+    Tile.textures[3] = loadImage("door-tile.png");
+  }
+
+  static draw(index, x, y) {
+    image(Tile.textures[index], x * tileSize, y * tileSize, tileSize, tileSize);
+  }
+}
+
+// UI CLASS
+// user interface, inventory
+class UI {
+  constructor(game) {
+    this.game = game;
+    this.showInventory = false;
+    this.message = "";
+    this.messageTimer = 0;
+  }
+
+  createInventoryButton() {
+    this.button = createButton("Inventory");
+    this.button.position(300, 50);
+    this.button.mousePressed(() => this.toggleInventory());
+  }
+
+  toggleInventory() {
+    this.showInventory = !this.showInventory;
+  }
+
+  setMessage(msg) {
+    this.message = msg;
+    this.messageTimer = millis(); // timestamp of when message started
+  }
+
+  display() {
+    if (this.showInventory) {
+      fill(255);
+      rect(50, 50, 300, 150, 10);
+      fill(0);
+      textSize(16);
+      text("Inventory:", 70, 80);
+
+      this.game.allBooks.forEach((book, i) => {
+
+        const yPos = 100 + i * 20;
+        fill(book.collected ? 169 : 0); // grey if collected
+        text("- " + book.name, 70, yPos);
+      });
+    }
+
+    // show pickup message for 3 sec
+    if (this.message && millis() - this.messageTimer < 3000) {
+      fill(255);
+      rect(50, height - 50, 600, 30, 10);
+      fill(0);
+      textSize(14);
+      text(this.message, 70, height - 30);
+    }
+  }
+}
+
+
+
+// === Maps ===
 let mainRoomMap = [
   [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
   [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3, 2],
@@ -38,279 +371,3 @@ let childrenLibraryMap = [
   [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2],
   [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
 ];
-
-function preload() {
-  textures[0] = loadImage("floor-tile.png");
-  textures[1] = loadImage("bookshelf.png");
-  textures[2] = loadImage("brown-wall-tile.png");
-  textures[3] = loadImage("door-tile.png");
-
-  redBookImg = loadImage("red-book.png");
-  greenBookImg = loadImage("green-book.png");
-  blueBookImg = loadImage("blue-book.png");
-}
-
-function setup() {
-  createCanvas(700, 500);
-
-  // player starting tile position
-  playerGrid = createVector(3, 5);
-
-  // npcs use screen coords still (can be moved later if needed)
-  npc = createVector((2 * width - 1000) / 3, height / 2 - 80); // gardener
-  clown = createVector(width / 2, height / 2 + 100); // class clown
-  student = createVector(width / 2 + 150, height / 2 - 130); // chef student
-  librarian = createVector((2 * width + 450) / 3, height / 2); //librarian
-
-  // books
-  book = createVector(width / 2  + 60 , height / 3);
-  cheapRecipes = createVector(width / 3, height / 3);
-  inconvenienceBook = createVector(width / 3, height / 2);
-
-  inventoryButton = createButton("Inventory");
-  inventoryButton.position(300, 50);
-  inventoryButton.mousePressed(toggleInventory);
-
-}
-
-function toggleInventory() {
-  showInventory = !showInventory;
-}
-
-
-function drawTiles() {
-  let map = currentRoom === "mainRoom" ? mainRoomMap : childrenLibraryMap;
-
-  for (let y = 0; y < tilesY; y++) {
-    for (let x = 0; x < tilesX; x++) {
-      let tileIndex = map[y][x];
-      if (textures[tileIndex]) {
-        image(
-          textures[tileIndex],
-          x * tileSize,
-          y * tileSize,
-          tileSize,
-          tileSize
-        );
-      }
-    }
-  }
-}
-
-function draw() {
-  background(220);
-  drawTiles();
-
-  let playerX = playerGrid.x * tileSize + tileSize / 2;
-  let playerY = playerGrid.y * tileSize + tileSize / 2;
-
-  // current room elements
-  if (currentRoom === "mainRoom") {
-    fill(255, 184, 237);
-    ellipse(npc.x, npc.y, 40, 40);
-    fill(0);
-    textSize(16);
-    text("NPC: Gardener", npc.x - 30, npc.y - 30);
-
-    fill(255, 184, 237);
-    ellipse(librarian.x, librarian.y, 40, 40);
-    fill(0);
-    textSize(16);
-    text("NPC: Librarian", librarian.x - 30, librarian.y - 30);
-
-  
-    if (!bookCollected) {
-      image(redBookImg, book.x, book.y, 20, 20); //red book
-    }
-  } else if (currentRoom === "childrenLibrary") {
-    fill(255, 184, 237);
-    ellipse(clown.x, clown.y, 40, 40);
-    fill(0);
-    textSize(16);
-    text("NPC: class clown", clown.x - 30, clown.y - 30);
-  
-    fill(255, 184, 237);
-    ellipse(student.x, student.y, 40, 40);
-    fill(0);
-    textSize(16);
-    text("NPC: chef Student", student.x - 30, student.y - 30);
-  
-    if (!inventory.includes("Cheap Recipes")) {
-      image(greenBookImg, cheapRecipes.x, cheapRecipes.y, 20, 20); // green book
-    }
-  
-    if (!inventory.includes("How to Inconvenience Your Classmates")) {
-      image(blueBookImg, inconvenienceBook.x, inconvenienceBook.y, 20, 20); // blue book
-    }
-  }
-  
-
-  // draw player
-  fill(209, 247, 255);
-  ellipse(playerX, playerY, 40, 40);
-
-  // detect proximity for dialogue
-  if (
-    dist(playerX, playerY, npc.x, npc.y) < 30 ||
-    dist(playerX, playerY, clown.x, clown.y) < 30 ||
-    dist(playerX, playerY, student.x, student.y) < 30
-  ) {
-    showMenu = true;
-  } else {
-    showMenu = false;
-    selectedOption = null;
-  }
-
-  if (showMenu) {
-    fill(255);
-    rect(50, height - 120, 500, 100, 10);
-    fill(0);
-    textSize(16);
-    text("Dialogue options:", 70, height - 90);
-
-    fill(200);
-    rect(70, height - 60, 100, 30, 5);
-    rect(180, height - 60, 100, 30, 5);
-    rect(290, height - 60, 100, 30, 5);
-
-    fill(0);
-    text("1. Inquire", 100, height - 40);
-    text("2. Challenge", 200, height - 40);
-    text("3. Accuse", 320, height - 40);
-  }
-
-  if (selectedOption) {
-    fill(255);
-    rect(50, height - 160, 500, 40, 10);
-    fill(0);
-    textSize(16);
-
-    if (dist(playerX, playerY, npc.x, npc.y) < 60) {
-      if (selectedOption === "inquire") {
-        text("NPC: I'm borrowing a book on gardening.", 70, height - 135);
-      } else if (selectedOption === "challenge") {
-        text("NPC: I borrowed it last week!! >:(", 70, height - 135);
-      } else if (selectedOption === "accuse") {
-        text("GAME OVER", 70, height - 135);
-        noLoop();
-      }
-    }
-
-    if (dist(playerX, playerY, clown.x, clown.y) < 60) {
-      if (selectedOption === "inquire") {
-        text(
-          "NPC: I put in a lot of research into being a nuisance.",
-          70,
-          height - 135
-        );
-      } else if (selectedOption === "challenge") {
-        text("NPC: I borrowed it last week!! >:(", 70, height - 135);
-      } else if (selectedOption === "accuse") {
-        text("GAME OVER", 70, height - 135);
-        noLoop();
-      }
-    }
-
-    if (dist(playerX, playerY, student.x, student.y) < 60) {
-      if (selectedOption === "inquire") {
-        text("NPC: I borrowed a Cheap Recipes book.", 70, height - 135);
-      } else if (selectedOption === "challenge") {
-        text("NPC: I borrowed it last week!! >:(", 70, height - 135);
-      } else if (selectedOption === "accuse") {
-        text("GAME OVER", 70, height - 135);
-      }
-    }
-
-    if (dist(playerX, playerY, librarian.x, librarian.y) < 60) {
-      if (selectedOption === "inquire") {
-        text("NPC: Please whisper. Some of us are trying to read.", 70, height - 135);
-      } else if (selectedOption === "challenge") {
-        text("NPC: Shhh. We *will* throw you out.", 70, height - 135);
-      } else if (selectedOption === "accuse") {
-        text("GAME OVER: Librarian revoked your reading privileges.", 70, height - 135);
-        noLoop();
-      }
-    }
-    
-
-
-
-
-  }
-
-  if (showInventory) {
-    fill(255);
-    rect(50, 50, 300, 150, 10);
-    fill(0);
-    textSize(16);
-    text("Inventory:", 70, 80);
-    for (let i = 0; i < inventory.length; i++) {
-      text("- " + inventory[i], 70, 100 + i * 20);
-    }
-  }
-}
-
-function keyPressed() {
-  let dx = 0;
-  let dy = 0;
-
-  if (key === "w" || key === "W") dy = -1;
-  if (key === "s" || key === "S") dy = 1;
-  if (key === "a" || key === "A") dx = -1;
-  if (key === "d" || key === "D") dx = 1;
-
-  let newX = constrain(playerGrid.x + dx, 0, tilesX - 1);
-  let newY = constrain(playerGrid.y + dy, 0, tilesY - 1);
-
-  let currentMap = currentRoom === "mainRoom" ? mainRoomMap : childrenLibraryMap;
-  let tile = currentMap[newY][newX];
-  
-
-  // only update if not a wall (2) or bookshelf (1)
-  if (tile !== 2 && tile !== 1) {
-    playerGrid.x = newX;
-    playerGrid.y = newY;
-  }
-
-  // dialogue selection
-  if (showMenu) {
-    if (key === "1") selectedOption = "inquire";
-    else if (key === "2") selectedOption = "challenge";
-    else if (key === "3") selectedOption = "accuse";
-  }
-
-  // toggle inventory
-  if (key === "i" || key === "I") showInventory = !showInventory;
-
-  // check if player touches books
-  let px = playerGrid.x * tileSize + tileSize / 2;
-  let py = playerGrid.y * tileSize + tileSize / 2;
-
-  if (dist(px, py, book.x, book.y) < 30 && !bookCollected) {
-    bookCollected = true;
-    inventory.push("Gardening Book");
-  }
-
-  if (
-    dist(px, py, cheapRecipes.x, cheapRecipes.y) < 30 &&
-    !inventory.includes("Cheap Recipes")
-  ) {
-    inventory.push("Cheap Recipes");
-  }
-
-  if (
-    dist(px, py, inconvenienceBook.x, inconvenienceBook.y) < 30 &&
-    !inventory.includes("How to Inconvenience Your Classmates")
-  ) {
-    inventory.push("How to Inconvenience Your Classmates");
-  }
-  let tileUnderPlayer = currentMap[playerGrid.y][playerGrid.x];
-
-  // if player is on a door tile, switch room
-  if (tileUnderPlayer === 3) {
-    currentRoom = currentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
-
-    // reset player position when entering new room
-    playerGrid = createVector(3, 5);
-  }
-}

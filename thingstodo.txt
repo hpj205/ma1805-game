@@ -4,7 +4,7 @@
     - make both buttons look nicer
     - make inventory/evidence array look nicer as well
 
-- add in desk + librarian npc!
+- add in desk for librarian npc!
 
 - fix book names + inventory problems
     - alert user when book/evidence are discovered
