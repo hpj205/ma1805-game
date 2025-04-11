@@ -1,0 +1,21 @@
+PROGRAMMING
+- add in an evidence array
+    - create an evidence button next to the inventory button
+    - make both buttons look nicer
+    - make inventory/evidence thingy lok good
+
+- stuff i've been looking at 
+
+https://stackoverflow.com/questions/29382730/creating-a-simple-inventory-system-in-javascript for inventory.
+inventories r lit just arrays and i did this in HL compsci w/ js already so i just needed a little push tbh
+
+https://frannieello.github.io/interactive-toolchain/ came up, not really helpful but gave me ideas for sprite
++ movement
+
+learnt how to use dist for my preiovus project: 
+
+
+
+ARTWORK
+- add in desk for librarian npc!
+- begin drawing up the npcs!!
