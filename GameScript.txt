@@ -2,11 +2,11 @@ Characters:
 •	The Substitute: The Player Character, a substitute teacher who is in charge as a chaperone of a class trip to the library. After the librarian confronts the sub that some of the books are missing, and she briefly saw one of the students (but couldn’t make out exactly who), pocketing one of the library’s books in an attempt to steal it. So, it is now the Players job to find the missing books, and also interview each of the students to figure out who had stolen one of the books
 •	The librarian: A very disorganised and neglectful librarian (though she tries to deny it), after noticing that some of the books in the library are missing, and noticing one of the students trying to sneak with one of the books, she tasks the teacher chaperone to find the stolen books (though only one book is stolen, the rest she misplaced)
 •	The Students/Suspects:
-o	Cassie: A shy girl who stutters a lot. When talked about interest, she reveals she wants to learn to become braver and wishes to find a role model to show her how (The book she might steal is The Tale of the Courageous MegaGirl)
-o	Rosalyn: A girl who loves romance and poetry, when talked about her interests, she reveals she wants to write her own poetry with beautiful flowery words (The book she might steal is The Complete Language of Flowers)
-o	Josh: A boy who loves all things science fiction. Has a rivalry with Amalia. (The book he might steal is Starlight Explorers: Journey to the Cosmic Fair)
-o	Amalia: A girl who loves all things fantasy. Has a rivalry with Derek. (The book she might steal is The Elf Princess and the Last Dragon)
-o	Derek: An intuitive young boy who tries to act like he’s the real detective trying to find the books. When asked about his interests, he reveals that he wants to become the best detective in the world. (The book he might steal is Glasses Jones and the Elusive Emerald)
+o	    Cassie: A shy girl who stutters a lot. When talked about interest, she reveals she wants to learn to become braver and wishes to find a role model to show her how (The book she might steal is The Tale of the Courageous MegaGirl)
+o	    Rosalyn: A girl who loves romance and poetry, when talked about her interests, she reveals she wants to write her own poetry with beautiful flowery words (The book she might steal is The Complete Language of Flowers)
+o	    Josh: A boy who loves all things science fiction. Has a rivalry with Amalia. (The book he might steal is Starlight Explorers: Journey to the Cosmic Fair)
+o	    Amalia: A girl who loves all things fantasy. Has a rivalry with Derek. (The book she might steal is The Elf Princess and the Last Dragon)
+o	    Derek: An intuitive young boy who tries to act like he’s the real detective trying to find the books. When asked about his interests, he reveals that he wants to become the best detective in the world. (The book he might steal is Glasses Jones and the Elusive Emerald)
 Script
 
 •	The game starts with the intro screen (Title of the game, then underneath the controls: W,A,S,D to move, then under that is the start button)
