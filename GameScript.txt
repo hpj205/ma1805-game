@@ -1,0 +1,138 @@
+Characters:
+•	The Substitute: The Player Character, a substitute teacher who is in charge as a chaperone of a class trip to the library. After the librarian confronts the sub that some of the books are missing, and she briefly saw one of the students (but couldn’t make out exactly who), pocketing one of the library’s books in an attempt to steal it. So, it is now the Players job to find the missing books, and also interview each of the students to figure out who had stolen one of the books
+•	The librarian: A very disorganised and neglectful librarian (though she tries to deny it), after noticing that some of the books in the library are missing, and noticing one of the students trying to sneak with one of the books, she tasks the teacher chaperone to find the stolen books (though only one book is stolen, the rest she misplaced)
+•	The Students/Suspects:
+o	Cassie: A shy girl who stutters a lot. When talked about interest, she reveals she wants to learn to become braver and wishes to find a role model to show her how (The book she might steal is The Tale of the Courageous MegaGirl)
+o	Rosalyn: A girl who loves romance and poetry, when talked about her interests, she reveals she wants to write her own poetry with beautiful flowery words (The book she might steal is The Complete Language of Flowers)
+o	Josh: A boy who loves all things science fiction. Has a rivalry with Amalia. (The book he might steal is Starlight Explorers: Journey to the Cosmic Fair)
+o	Amalia: A girl who loves all things fantasy. Has a rivalry with Derek. (The book she might steal is The Elf Princess and the Last Dragon)
+o	Derek: An intuitive young boy who tries to act like he’s the real detective trying to find the books. When asked about his interests, he reveals that he wants to become the best detective in the world. (The book he might steal is Glasses Jones and the Elusive Emerald)
+Script
+
+•	The game starts with the intro screen (Title of the game, then underneath the controls: W,A,S,D to move, then under that is the start button)
+•	The game starts like a cutscene where the player, the substitute teacher is in front of the librarian’s desk.
+o	    Librarian: You need to learn how to control your students!
+o	    Teacher: Can you calm down and tell me what happened ma’am?
+o	    Librarian: Well, I noticed that some of the books are missing, and I noticed that one of your students pocketing one of them and darting away!
+o	    Teacher: Can you tell me which student it was so I can get it back?
+o	    Librarian: Well, I couldn’t really see the child that well, but I know it was one of the books and the only children here currently are your students.
+o	    Librarian: And if one of your students could steal one of my books then they all could have stolen them!
+o	    Teacher: That’s a bit harsh to say. Could it be that some of them were misplaced?
+o	    Librarian: Unlikely! I keep this library in tip top shape!
+o	    Teacher *internally*: And yet she can’t notice some of the books are on the floor
+o	    Teacher: *Sigh* I will interview each of my students and bring all of the missing books back
+o	    Librarian: You better, here is a list of the books that are missing
+o	    (After this the cutscene ends and the player is free to move)
+•	Places the missing books can be:
+o	    There is one book on the librarian’s desk that she doesn’t notice. When clicked on:
+	        Teacher: Ma’am
+	        Librarian: What is it?
+	        Teacher: This book here
+	        Librarian: What of it
+	        Teacher: Isn’t this one of the missing books
+	        Librarian: It is certainly no-
+	        Librarian: …………
+	        Librarian: I’ll just put this back when I’m done reading.
+o	    The other books can be misplaced on the wrong shelf, fallen behind a shelf, on the floor, or on one of the tables
+•	Interviewing the students:
+o	    Cassie:
+	        When clicked on alibi: 
+•	            Teacher: Cassie, can I know where you were in the past few minutes, one of the library’s books have gone missing.
+•	            Cassie: O-oh, s-s-sorry ma’am, I’ve been here t-the whole time, lo-looking at the t-titles of the b-books 
+•	            Teacher: Thank you, Cassie
+o	            (This adds to the evidence list that Cassie was at this specific shelf looking at the books)
+	        When clicked on talk:
+•	            Teacher: Cassie, can I know what kind of books you are interested in?
+•	            Cassie: O-oh w-well, I want t-to learn how to become more confident and b-braver, so I want to find a book with a-a girl l-like that so I might become like her one d-day.
+•	            Teacher: That sounds very nice.
+	        When Clicked accuse (and she stole the book):
+•	            Teacher: Cassie can you please empty out your pockets
+•	            Cassie: B-b-but why?
+•	            Teacher: Cassie, please.
+•	            Cassie silently pulls out the book
+•	            Teacher: I’m not mad, but you should know it isn’t right to steal. Let’s go get this book checked out together, ok?
+•	            Cassie: Okay.
+•	            Then the game ends with the game won screen with the Play Again? Button at the bottom
+	        When Clicked accuse (but she didn’t steal the book):
+•	            Teacher: Cassie can you please empty out your pockets
+•	            Cassie: B-b-but why?
+•	            Teacher: Cassie, please.
+•	            (Cassie’s pockets are empty)
+•	            Teacher:
+•	            Cassie:
+•	            Librarian:
+•	            Librarian: Wow you’re a bad teacher
+•	            Teacher: SHUT UP!
+•	            (Then the game ends with the game over screen with the Play Again? Button at the bottom)
+o	    Rosalyn:
+	        When clicked on alibi: 
+•	            Teacher: Rosalyn, can I ask you something?
+•	            Rosalyn: Of course, what is it?
+•	            Teacher: I need to know where exactly you’ve been for the past few minutes, one of the library’s books has gone missing
+•	            Rosalyn: Well, I was here in the kids’ section with all of the adorable stuffed animals. There so cute and soft!
+•	            Teacher: Thank you
+o	            (This adds to the evidence list that Rosalyn was in the kids’ section with the stuffed animals)
+•	
+	        When clicked on talk:
+•	            Teacher: Rosalyn, can I know what kind of books you are interested in?
+•	            Rosalyn: Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that.
+•	            Teacher: That sounds very lovely Rosalyn.
+	        When Clicked accuse (and she stole the book):
+•	            Teacher: Rosalyn can you please empty out your pockets
+•	            Rosalyn: HUH!? But why!
+•	            Teacher: Rosalyn, please.
+•	            (Rosalyn silently pulls out the book)
+•	            Teacher: I’m not mad, but you should know it isn’t right to steal. Let’s go get this book checked out together, ok?
+•	            Rosalyn: *Sigh* Alright. I’m very sorry
+•	            (Then the game ends with the game won screen with the Play Again? Button at the bottom)
+	        When Clicked accuse (but she didn’t steal the book):
+•	            Teacher: Rosalyn can you please empty out your pockets
+•	            Rosalyn: Huh? Why? I didn’t steal anything!
+•	            Teacher: Rosalyn, please.
+•	            Rosalyn’s pockets are empty
+•	            Teacher:
+•	            Rosalyn:
+•	            Librarian:
+•	            Librarian: Wow you’re a bad teacher
+•	            Teacher: SHUT UP!
+•	            (Then the game ends with the game over screen with the Play Again? Button at the bottom)
+o	    Derek:
+	        When clicked on alibi: 
+•	            Teacher: Derek, can I ask you something?
+•	            Derek: Ah, you’re looking for the missing books aren’t you teacher?
+•	            Teacher: Huh?! Well, yes. How did you know that?
+•	            Derek: Well, I am the best detective in the world for a reason.
+•	            Teacher: ………
+•	            Derek: ………
+•	            Derek: Ok, I overheard you talking with the librarian
+•	            Teacher: Alright then. Derek, I need to know where-
+•	            Derek: I was near the librarian’s desk, and I noticed that there seemed to be books strewn everywhere in the library, so I kept watch
+•	            Teacher: ……. Ok, well thank you Derek
+o	            (This adds to the evidence list that Derek was near the Librarian’s desk)
+	        When clicked on talk:
+•	            Teacher: Derek, can I know what kind of books you are interested in?
+•	            Derek: Ah, are you trying to find out my motivation dear teacher? Well as you should know, as an amazing detective, I only read mystery novels and science books to hone my skills.
+•	            Teacher: …... That sounds nice Derek.
+•	            Teacher *Internally*: Man, this kid is weird.
+	        When Clicked accuse (and he stole the book):
+•	            Teacher: Derek, I need you to empty out your pockets, I know you took the book
+•	            Derek: WHAT?! But I’m the detective I can’t steal!
+•	            Teacher: Derek, please.
+•	            (Derek silently pulls out the book)
+•	            Teacher: *Sigh* Derek…
+•	            Derek: I was going to give it back. I was going to use to help me find the other books
+•	            Teacher: I know you wanted to help but doing something wrong won’t make it become right
+•	            Derek: Ok, I’m sorry
+•	            Teacher: It’s alright as long as you know
+•	            (Then the game ends with the game won screen with the Play Again? Button at the bottom)
+	        When Clicked accuse (but he didn’t steal the book):
+•	            Teacher: Derek can you please empty out your pockets
+•	            Derek: What?! But I’m the detective! I couldn’t steal something!
+•	            Teacher: Derek, please.
+•	            (Derek’s pockets are empty)
+•	            Teacher:
+•	            Derek: I told you! You doubted my abilities as the greatest detective!
+•	            Librarian:
+•	            Librarian: To be honest he’s right, I should have tasked him to find the books not you
+•	            Teacher: SHUT UP! BOTH OF YOU
+•	            (Then the game ends with the game over screen with the Play Again? Button at the bottom)
