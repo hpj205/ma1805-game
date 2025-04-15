@@ -1,5 +1,8 @@
 /* == programmer notes ==
 
+fml
+
+
  */
 
 //GLOBAL VARIABLES
@@ -13,6 +16,12 @@ let redBookImg, greenBookImg, blueBookImg;
 // "why'd you call them nameNPC instead of just name?"
 // its easier to search thru code n find them bc npcs are where all the bugs are
 let amaliaNpc, cassieNpc, derekNpc, joshNpc, libNpc, rosalynNpc, teacherNpc;
+
+let currentNPC = null;
+let gameState = "explore";
+let dialogueType = "";
+let dialogueIndex = 0;
+let playAgainButton;
 
 //PRELOAD
 function preload() {
@@ -31,6 +40,8 @@ function preload() {
 //SET UP
 function setup() {
   createCanvas(700, 500);
+  gameFont = "monospace";
+  textFont(gameFont);
   game = new Game();
   game.setup();
 }
@@ -76,10 +87,7 @@ class Game {
           "Amalia",
           200,
           170,
-          [
-            "I'm borrowing a book on gardening.",
-            "I borrowed it last week!! >:(",
-          ],
+          ["filler dialogue", "filler dialogue"],
           amaliaNpc
         ),
         new NPC(
@@ -94,10 +102,49 @@ class Game {
           "Derek",
           300,
           250,
-          [
-            "Don't look at me. I'm studying...",
-            "What book? I didn’t see anything.",
-          ],
+          {
+            talk: [
+              "Teacher: Derek, can I know what kind of books you are interested in?",
+               "Derek: Ah, are you trying to find out my motivation dear teacher? Well as you should know, as an amazing detective, I only read mystery novels and science books to hone my skills.",
+               "Teacher: …... That sounds nice Derek.",
+              "Teacher *Internally*: Man, this kid is weird"
+            ],
+            alibi: [
+              "Teacher: Derek, can I ask you something?",
+              "Derek: Ah, you’re looking for the missing books aren’t you teacher?",
+              "Teacher: Huh?! Well, yes. How did you know that?",
+              "Derek: Well, I am the best detective in the world for a reason.",
+              "Teacher: ………",
+              "Derek: ………",
+              "Derek: Ok, I overheard you talking with the librarian",
+              "Teacher: Alright then. Derek, I need to know where-",
+              "Derek: I was near the librarian’s desk, and I noticed that there seemed to be books strewn everywhere in the library, so I kept watch",
+              "Teacher: ……. Ok, well thank you Derek",
+              //ADDS EVIDENCE: DEREK WAS NEAR THE LIBRARIANS DESK
+            ],
+            accuseGuilty: [
+              "Teacher: Derek, I need you to empty out your pockets, I know you took the book",
+              "Derek: WHAT?! But I’m the detective I can’t steal!",
+              "Teacher: Derek, please.",
+              "(Derek silently pulls out the book)",
+              "Teacher: *Sigh* Derek…",
+              "Derek: I was going to give it back. I was going to use to help me find the other books",
+              "Teacher: I know you wanted to help but doing something wrong won’t make it become right",
+              "Derek: Ok, I’m sorry",
+              "Teacher: It’s alright as long as you know",
+            ],
+            accuseInnocent: [
+              "Teacher: Derek can you please empty out your pockets",
+              "Derek: What?! But I’m the detective! I couldn’t steal something!",
+              "Teacher: Derek, please.",
+              "(Derek’s pockets are empty)",
+              " Teacher:.....",
+              "Derek: I told you! You doubted my abilities as the greatest detective!",
+              "Librarian:......",
+              " Librarian: To be honest he’s right, I should have tasked him to find the books not you",
+              "Teacher: SHUT UP! BOTH OF YOU",
+            ]
+          },
           derekNpc
         ),
       ],
@@ -111,17 +158,41 @@ class Game {
           "Josh",
           350,
           350,
-          [
-            "I put in a lot of research into being a nuisance.",
-            "I borrowed it last week!! >:(",
-          ],
+          ["filler dialogue", "filler dialogue"],
           joshNpc
         ),
         new NPC(
           "Cassie",
           500,
           120,
-          ["I borrowed a Cheap Recipes book.", "I borrowed it last week!! >:("],
+          {
+            talk: [
+              "Teacher: Cassie, can I know what kind of books you are interested in?",
+              "Cassie: O-oh w-well, I want t-to learn how to become more confident and b-braver...",
+              "Teacher: That sounds very nice."
+            ],
+            alibi: [
+              "Teacher: Cassie, can I know where you were in the past few minutes, one of the library’s books have gone missing.",
+              "Cassie: O-oh, s-s-sorry ma’am, I’ve been here t-the whole time, lo-looking at the t-titles of the b-books",
+              "Teacher: Thank you, Cassie."
+            ],
+            accuseGuilty: [
+              "Teacher: Cassie can you please empty out your pockets",
+              "Cassie: B-b-but why?",
+              "Teacher: Cassie, please.",
+              "Cassie silently pulls out the book.",
+              "Teacher: I’m not mad, but you should know it isn’t right to steal...",
+              "Cassie: Okay."
+            ],
+            accuseInnocent: [
+              "Teacher: Cassie can you please empty out your pockets",
+              "Cassie: B-b-but why?",
+              "Teacher: Cassie, please.",
+              "(Cassie’s pockets are empty)",
+              "Librarian: Wow you’re a bad teacher.",
+              "Teacher: SHUT UP!"
+            ]
+          },
           cassieNpc
         ),
 
@@ -129,7 +200,10 @@ class Game {
           "Rosalyn",
           150,
           250,
-          ["I was just here for story time...", "I didn’t take anything!"],
+          [
+            "Well, I was here in the kids’ section with all of the adorable stuffed animals. There so cute and soft!",
+            "Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that.",
+          ],
           rosalynNpc
         ),
       ],
@@ -236,32 +310,28 @@ class Room {
 class Player {
   constructor(x, y) {
     this.grid = createVector(x, y);
-    this.sprite = teacherNpc
+    this.sprite = teacherNpc;
   }
 
   display() {
     imageMode(CENTER);
-    if (this.sprite){
-    image(
-      this.sprite,
-      this.grid.x * tileSize + tileSize/2,
-      this.grid.y * tileSize + tileSize /2,
-      40,//width
-      60//height
-    
-
-    );
-  }else{
-    fill (208, 247, 255);
-    ellipse(
-      this.grid.x * tileSize + tileSize/2,
-      this.grid.y * tileSize + tileSize /2,
-      40
-      
-    );
-      }
+    if (this.sprite) {
+      image(
+        this.sprite,
+        this.grid.x * tileSize + tileSize / 2,
+        this.grid.y * tileSize + tileSize / 2,
+        40, //width
+        60 //height
+      );
+    } else {
+      fill(208, 247, 255);
+      ellipse(
+        this.grid.x * tileSize + tileSize / 2,
+        this.grid.y * tileSize + tileSize / 2,
+        40
+      );
     }
-  
+  }
 
   handleInput(k, room) {
     let dx = 0,
@@ -293,7 +363,6 @@ class Player {
   setPosition(x, y) {
     this.grid.set(x, y);
   }
-
 }
 // NPC CLASS
 class NPC {
@@ -324,6 +393,7 @@ class NPC {
     // name over the sprites head
     fill(0);
     textSize(14);
+    textFont("monospace");
     text(this.name, this.pos.x - 30, this.pos.y - 40);
 
     //show dialogue optns if npc is active
@@ -332,7 +402,7 @@ class NPC {
       rect(50, height - 140, 600, 120, 10);
       fill(0);
       textSize(14);
-      text("1. Inquire    2. Challenge    3. Accuse", 70, height - 110);
+      text("1. Talk    2. Alibi    3. Accuse", 70, height - 110);
 
       // display NPCS last line of dialogue
       if (this.lastLine) {
@@ -475,6 +545,7 @@ class UI {
       rect(50, height - 50, 600, 30, 10);
       fill(0);
       textSize(14);
+      textFont("monospace");
       text(this.message, 70, height - 30);
     }
   }
