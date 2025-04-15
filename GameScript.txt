@@ -136,3 +136,28 @@ o	            (This adds to the evidence list that Derek was near the Librarian�
 •	            Librarian: To be honest he’s right, I should have tasked him to find the books not you
 •	            Teacher: SHUT UP! BOTH OF YOU
 •	            (Then the game ends with the game over screen with the Play Again? Button at the bottom)
+
+Josh & Amalia's original plotlines have been scrapped so they instead will be used to help the player find out evidence for some of the missing books
+
+Amalia: 
+    Teacher: Amalia, some of the books have gone missing, may I know where you have been?
+    Amalia: Sorry teach, but I’ve been here the whole time reading this book I checked out, see?
+    (You look on the back of the cover, noting that the book is indeed stamped with Amalia’s name on it)
+    Teacher: Ok then, thank you Amalia.
+    Amalia: Jeez, if you want to interrogate anyone with a book, ask that librarian. I haven’t been here long, but she seems really disorganized, maybe some of the books on her desk are the missing books.
+    Teacher *internally*: Well she’s not wrong.
+    *(Check the Librarian’s desk added to evidence)*
+
+Josh:
+    Teacher: Josh some of the books went missing, may I ask if you have seen any of them?
+    Josh:
+    Teacher:
+    Josh:
+    Teacher:
+    Josh: Did you seriously forget I’m blind?
+    Teacher:………………Yes
+    Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them
+    Teacher: Thank you, did you remember which bookshelf?
+    Josh:……
+    Teacher: Oh, right. Sorry.
+    (Books have fallen behind bookshelves added to evidence list)
