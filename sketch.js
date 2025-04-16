@@ -1,6 +1,11 @@
 /* == programmer notes ==
 
-fml
+problems that need fixing 
+
+- text running off screen
+- teacher dialogue not appearing
+
+
 
 
  */
@@ -16,7 +21,6 @@ let redBookImg, greenBookImg, blueBookImg;
 // "why'd you call them nameNPC instead of just name?"
 // its easier to search thru code n find them bc npcs are where all the bugs are
 let amaliaNpc, cassieNpc, derekNpc, joshNpc, libNpc, rosalynNpc, teacherNpc;
-
 let currentNPC = null;
 let gameState = "explore";
 let dialogueType = "";
@@ -200,17 +204,52 @@ class Game {
           "Rosalyn",
           150,
           250,
-          [
-            "Well, I was here in the kids’ section with all of the adorable stuffed animals. There so cute and soft!",
-            "Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that.",
-          ],
+          {
+            talk: [
+              "Teacher: Rosalyn, can I know what kind of books you are interested in?",
+              "Rosalyn: Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that",
+              "Teacher: That sounds very lovely Rosalyn.",
+            
+            ],
+
+            alibi: [
+              "Teacher: Rosalyn, can I ask you something?",
+              "Rosalyn: Of course, what is it?",
+              "Teacher: I need to know where exactly you’ve been for the past few minutes, one of the library’s books has gone missing",
+              "Rosalyn: Well, I was here in the kids’ section with all of the adorable stuffed animals. They're so cute and soft!",
+              "Teacher: Thank you",
+
+              //ADDS EVIDENCE: ROSYALN WAS IN THE KIDS SECTION W/ STUFFIES
+
+            ],
+            accuseGuilty: [
+              "Teacher: Rosalyn can you please empty out your pockets",
+              "Rosalyn: HUH!? But why!",
+              "Teacher: Rosalyn, please.",
+              "(Rosalyn silently pulls out the book)",
+              "Teacher: I’m not mad, but you should know it isn’t right to steal. Let’s go get this book checked out together, ok?",
+              "Rosalyn: *Sigh* Alright. I’m very sorry"
+
+            ],
+            accuseInnocent: [
+              "Teacher: Rosalyn can you please empty out your pockets",
+              "Rosalyn: Huh? Why? I didn’t steal anything!",
+              "Teacher: Rosalyn, please.",
+              "(Rosalyn’s pockets are empty)",
+              "Teacher:",
+              "Rosalyn:",
+              "Librarian:",
+              "Librarian: Wow you’re a bad teacher",
+              "Teacher: SHUT UP!"
+            ]
+          },
           rosalynNpc
         ),
       ],
       [
-        new Book("Cheap Recipes", greenBookImg, 250, 170, this),
+        new Book("The Elf Princess and the Last Dragon", greenBookImg, 250, 170, this),
         new Book(
-          "How to Inconvenience...",
+          "Starlight Explorers: Journey to the Cosmic Fair",
           blueBookImg,
           5 * tileSize + tileSize / 2,
           3 * tileSize + tileSize / 2,
@@ -221,10 +260,10 @@ class Game {
 
     //evidence added to rooms
     this.rooms["mainRoom"].evidence.push(
-      new Evidence("Gardening Tips", 100, 200, [])
+      new Evidence("filler", 100, 200, [])
     );
     this.rooms["childrenLibrary"].evidence.push(
-      new Evidence("Cheap Recipes", 400, 300, [])
+      new Evidence("filler", 400, 300, [])
     );
 
     for (let roomName in this.rooms) {
@@ -366,13 +405,14 @@ class Player {
 }
 // NPC CLASS
 class NPC {
-  constructor(name, x, y, dialogues, img = null) {
+  constructor(name, x, y, dialogues, img = null, isGuilty = false) {
     this.name = name;
     this.pos = createVector(x, y);
     this.dialogues = dialogues;
     this.active = false;
     this.lastLine = ""; // store last dialogue line
     this.img = img;
+    this.guilty = isGuilty;
   }
 
   checkProximity(player) {
@@ -411,11 +451,24 @@ class NPC {
       }
     }
   }
-  // self explanatory...
+
+  // refactored :p
   handleDialogue(k) {
-    const idx = parseInt(k) - 1;
-    if (idx >= 0 && idx < this.dialogues.length) {
-      this.lastLine = this.dialogues[idx];
+    // branching logic depending on player input (1, 2, 3)
+    if (k === "1") {// i think this is where the issue w the line is coming from
+      this.lastLine = this.dialogues.talk.shift() || "";
+    } else if (k === "2") {
+      this.lastLine = this.dialogues.alibi. shift() || "";
+    } else if (k === "3") {
+      // branch based on who is guilty
+      let isGuilty = this.name === "Cassie"; // filler thief
+      if (isGuilty) {
+        this.lastLine = this.dialogues.accuseGuilty[0];
+        this.lastLine = this.dialogues.accuseGuilty.shift() || "";
+      } else {
+        this.lastLine = this.dialogues.accuseInnocent[0];
+        this.lastLine = this.dialogues.accuseInnocent.shift() || "";
+      }
     } else {
       this.lastLine = "I don't understand that.";
     }
@@ -450,9 +503,9 @@ class Book {
   }
 
   static loadImages() {
-    redBookImg = loadImage("red-book.png");
-    greenBookImg = loadImage("green-book.png");
-    blueBookImg = loadImage("blue-book.png");
+    redBookImg = loadImage("Tiles/red-book.png");
+    greenBookImg = loadImage("Tiles/green-book.png");
+    blueBookImg = loadImage("Tiles/blue-book.png");
   }
 }
 
@@ -461,10 +514,10 @@ class Book {
 class Tile {
   static loadTextures() {
     Tile.textures = [];
-    Tile.textures[0] = loadImage("floor-tile.png");
-    Tile.textures[1] = loadImage("bookshelf.png");
-    Tile.textures[2] = loadImage("brown-wall-tile.png");
-    Tile.textures[3] = loadImage("door-tile.png");
+    Tile.textures[0] = loadImage("Tiles/floor-tile.png");
+    Tile.textures[1] = loadImage("Tiles/bookshelf.png");
+    Tile.textures[2] = loadImage("Tiles/brown-wall-tile.png");
+    Tile.textures[3] = loadImage("Tiles/door-tile.png");
   }
 
   static draw(index, x, y) {
