@@ -4,11 +4,10 @@ problems that need fixing
 
 - text running off screen
 - teacher dialogue not appearing
+- handleDialogue method is bugging 
+-> can be fixed i just need to figure out how tf 
 
-
-
-
- */
+*/
 
 //GLOBAL VARIABLES
 let tileSize = 50;
@@ -81,6 +80,38 @@ class Game {
     this.allBooks = [];
     this.allEvidence = [];
   }
+/*
+
+//dialogue to add
+Amalia: 
+    Teacher: Amalia, some of the books have gone missing, may I know where you have been?
+    Amalia: Sorry teach, but I’ve been here the whole time reading this book I checked out, see?
+    (You look on the back of the cover, noting that the book is indeed stamped with Amalia’s name on it)
+    Teacher: Ok then, thank you Amalia.
+    Amalia: Jeez, if you want to interrogate anyone with a book, ask that librarian. I haven’t been here long, but she seems really disorganized, maybe some of the books on her desk are the missing books.
+    Teacher *internally*: Well she’s not wrong.
+    *(Check the Librarian’s desk added to evidence)*
+
+Josh:
+    Teacher: Josh some of the books went missing, may I ask if you have seen any of them?
+    Josh:
+    Teacher:
+    Josh:
+    Teacher:
+    Josh: Did you seriously forget I’m blind?
+    Teacher:………………Yes
+    Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them
+    Teacher: Thank you, did you remember which bookshelf?
+    Josh:……
+    Teacher: Oh, right. Sorry.
+    (Books have fallen behind bookshelves added to evidence list)
+
+
+
+*/
+
+
+
 
   setup() {
     // room map, NPCs, books
@@ -91,14 +122,26 @@ class Game {
           "Amalia",
           200,
           170,
-          ["filler dialogue", "filler dialogue"],
+          {
+            talk: ["filler dialogue", "filler dialogue"],
+            alibi: ["alibi"],
+            accuseGuilty: ["accuse guilty"],
+            accuseInnocent: ["accuse innocent"],
+          },
+
           amaliaNpc
         ),
         new NPC(
           "Librarian",
           625,
           250,
-          ["Please whisper.", "We *will* throw you out."],
+          {
+            talk: ["filler dialogue", "filler dialogue"],
+            alibi: ["alibi"],
+            accuseGuilty: ["accuse guilty"],
+            accuseInnocent: ["accuse innocent"],
+          },
+
           libNpc
         ),
 
@@ -109,9 +152,9 @@ class Game {
           {
             talk: [
               "Teacher: Derek, can I know what kind of books you are interested in?",
-               "Derek: Ah, are you trying to find out my motivation dear teacher? Well as you should know, as an amazing detective, I only read mystery novels and science books to hone my skills.",
-               "Teacher: …... That sounds nice Derek.",
-              "Teacher *Internally*: Man, this kid is weird"
+              "Derek: Ah, are you trying to find out my motivation dear teacher? Well as you should know, as an amazing detective, I only read mystery novels and science books to hone my skills.",
+              "Teacher: …... That sounds nice Derek.",
+              "Teacher *Internally*: Man, this kid is weird",
             ],
             alibi: [
               "Teacher: Derek, can I ask you something?",
@@ -145,14 +188,14 @@ class Game {
               " Teacher:.....",
               "Derek: I told you! You doubted my abilities as the greatest detective!",
               "Librarian:......",
-              " Librarian: To be honest he’s right, I should have tasked him to find the books not you",
+              "Librarian: To be honest he’s right, I should have tasked him to find the books not you",
               "Teacher: SHUT UP! BOTH OF YOU",
-            ]
+            ],
           },
           derekNpc
         ),
       ],
-      [new Book("Gardening Book", redBookImg, 410, 170, this)]
+      [new Book("", redBookImg, 410, 170, this)]
     );
 
     this.rooms["childrenLibrary"] = new Room(
@@ -173,12 +216,12 @@ class Game {
             talk: [
               "Teacher: Cassie, can I know what kind of books you are interested in?",
               "Cassie: O-oh w-well, I want t-to learn how to become more confident and b-braver...",
-              "Teacher: That sounds very nice."
+              "Teacher: That sounds very nice.",
             ],
             alibi: [
               "Teacher: Cassie, can I know where you were in the past few minutes, one of the library’s books have gone missing.",
               "Cassie: O-oh, s-s-sorry ma’am, I’ve been here t-the whole time, lo-looking at the t-titles of the b-books",
-              "Teacher: Thank you, Cassie."
+              "Teacher: Thank you, Cassie.",
             ],
             accuseGuilty: [
               "Teacher: Cassie can you please empty out your pockets",
@@ -186,7 +229,7 @@ class Game {
               "Teacher: Cassie, please.",
               "Cassie silently pulls out the book.",
               "Teacher: I’m not mad, but you should know it isn’t right to steal...",
-              "Cassie: Okay."
+              "Cassie: Okay.",
             ],
             accuseInnocent: [
               "Teacher: Cassie can you please empty out your pockets",
@@ -194,8 +237,8 @@ class Game {
               "Teacher: Cassie, please.",
               "(Cassie’s pockets are empty)",
               "Librarian: Wow you’re a bad teacher.",
-              "Teacher: SHUT UP!"
-            ]
+              "Teacher: SHUT UP!",
+            ],
           },
           cassieNpc
         ),
@@ -209,7 +252,6 @@ class Game {
               "Teacher: Rosalyn, can I know what kind of books you are interested in?",
               "Rosalyn: Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that",
               "Teacher: That sounds very lovely Rosalyn.",
-            
             ],
 
             alibi: [
@@ -220,7 +262,6 @@ class Game {
               "Teacher: Thank you",
 
               //ADDS EVIDENCE: ROSYALN WAS IN THE KIDS SECTION W/ STUFFIES
-
             ],
             accuseGuilty: [
               "Teacher: Rosalyn can you please empty out your pockets",
@@ -228,8 +269,7 @@ class Game {
               "Teacher: Rosalyn, please.",
               "(Rosalyn silently pulls out the book)",
               "Teacher: I’m not mad, but you should know it isn’t right to steal. Let’s go get this book checked out together, ok?",
-              "Rosalyn: *Sigh* Alright. I’m very sorry"
-
+              "Rosalyn: *Sigh* Alright. I’m very sorry",
             ],
             accuseInnocent: [
               "Teacher: Rosalyn can you please empty out your pockets",
@@ -240,14 +280,20 @@ class Game {
               "Rosalyn:",
               "Librarian:",
               "Librarian: Wow you’re a bad teacher",
-              "Teacher: SHUT UP!"
-            ]
+              "Teacher: SHUT UP!",
+            ],
           },
           rosalynNpc
         ),
       ],
       [
-        new Book("The Elf Princess and the Last Dragon", greenBookImg, 250, 170, this),
+        new Book(
+          "The Elf Princess and the Last Dragon",
+          greenBookImg,
+          250,
+          170,
+          this
+        ),
         new Book(
           "Starlight Explorers: Journey to the Cosmic Fair",
           blueBookImg,
@@ -259,9 +305,7 @@ class Game {
     );
 
     //evidence added to rooms
-    this.rooms["mainRoom"].evidence.push(
-      new Evidence("filler", 100, 200, [])
-    );
+    this.rooms["mainRoom"].evidence.push(new Evidence("filler", 100, 200, []));
     this.rooms["childrenLibrary"].evidence.push(
       new Evidence("filler", 400, 300, [])
     );
@@ -438,27 +482,43 @@ class NPC {
 
     //show dialogue optns if npc is active
     if (this.active) {
+    
+      //dialogue optns box
       fill(255);
-      rect(50, height - 140, 600, 120, 10);
+      rect(50, height - 160, width - 100, 130, 10);
       fill(0);
       textSize(14);
+      textFont("monospace");
       text("1. Talk    2. Alibi    3. Accuse", 70, height - 110);
 
       // display NPCS last line of dialogue
       if (this.lastLine) {
         textSize(16);
-        text(`${this.name}: "${this.lastLine}"`, 70, height - 80);
+        fill(0);
+        textWrap(WORD);
+        text(`${this.name}: "${this.lastLine}"`, 70, height - 80, width - 140);
       }
+
     }
   }
 
-  // refactored :p
+  /* refactored again 16-04
+
+  issues were 
+  -- dialogue structure: im stupid and used string arrays for some dialogues
+  and objects for some but the method wld assume objects for all npcs bc im stupid
+  
+  - using shift() was a mistake it just boots the element off my dialogue array 
+
+  - key handling my biggest opp
+  */
   handleDialogue(k) {
     // branching logic depending on player input (1, 2, 3)
-    if (k === "1") {// i think this is where the issue w the line is coming from
+    if (k === "1") {
+      // i think this is where the issue w the line is coming from
       this.lastLine = this.dialogues.talk.shift() || "";
     } else if (k === "2") {
-      this.lastLine = this.dialogues.alibi. shift() || "";
+      this.lastLine = this.dialogues.alibi.shift() || "";
     } else if (k === "3") {
       // branch based on who is guilty
       let isGuilty = this.name === "Cassie"; // filler thief
@@ -506,6 +566,7 @@ class Book {
     redBookImg = loadImage("Tiles/red-book.png");
     greenBookImg = loadImage("Tiles/green-book.png");
     blueBookImg = loadImage("Tiles/blue-book.png");
+    //create more book sprites
   }
 }
 
@@ -518,6 +579,8 @@ class Tile {
     Tile.textures[1] = loadImage("Tiles/bookshelf.png");
     Tile.textures[2] = loadImage("Tiles/brown-wall-tile.png");
     Tile.textures[3] = loadImage("Tiles/door-tile.png");
+  
+
   }
 
   static draw(index, x, y) {
@@ -663,9 +726,9 @@ let mainRoomMap = [
   [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
   [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3, 2],
   [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 2],
-  [2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 2, 2, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 2],
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2],
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2],
