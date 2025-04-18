@@ -80,38 +80,6 @@ class Game {
     this.allBooks = [];
     this.allEvidence = [];
   }
-/*
-
-//dialogue to add
-Amalia: 
-    Teacher: Amalia, some of the books have gone missing, may I know where you have been?
-    Amalia: Sorry teach, but I’ve been here the whole time reading this book I checked out, see?
-    (You look on the back of the cover, noting that the book is indeed stamped with Amalia’s name on it)
-    Teacher: Ok then, thank you Amalia.
-    Amalia: Jeez, if you want to interrogate anyone with a book, ask that librarian. I haven’t been here long, but she seems really disorganized, maybe some of the books on her desk are the missing books.
-    Teacher *internally*: Well she’s not wrong.
-    *(Check the Librarian’s desk added to evidence)*
-
-Josh:
-    Teacher: Josh some of the books went missing, may I ask if you have seen any of them?
-    Josh:
-    Teacher:
-    Josh:
-    Teacher:
-    Josh: Did you seriously forget I’m blind?
-    Teacher:………………Yes
-    Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them
-    Teacher: Thank you, did you remember which bookshelf?
-    Josh:……
-    Teacher: Oh, right. Sorry.
-    (Books have fallen behind bookshelves added to evidence list)
-
-
-
-*/
-
-
-
 
   setup() {
     // room map, NPCs, books
@@ -123,10 +91,18 @@ Josh:
           200,
           170,
           {
-            talk: ["filler dialogue", "filler dialogue"],
-            alibi: ["alibi"],
-            accuseGuilty: ["accuse guilty"],
-            accuseInnocent: ["accuse innocent"],
+            talk: [
+              "Teacher: Amalia, some of the books have gone missing, may I know where you have been?",
+              "Amalia: Sorry teach, but I’ve been here the whole time reading this book I checked out, see?",
+              "(You look on the back of the cover, noting that the book is indeed stamped with Amalia’s name on it)",
+              "Teacher: Ok then, thank you Amalia.",
+              "Amalia: Jeez, if you want to interrogate anyone with a book, ask that librarian. I haven’t been here long, but she seems really disorganized, maybe some of the books on her desk are the missing books.",
+              "Teacher *internally*: Well she’s not wrong.",
+              //ADDS EVIDENCE: LIBRARIANS DESK
+            ],
+            alibi: ["Amalia does not need an alibi"],
+            accuseGuilty: ["You cannot accuse Amalia"],
+            accuseInnocent: ["You cannot accuse Amalia"],
           },
 
           amaliaNpc
@@ -205,9 +181,25 @@ Josh:
           "Josh",
           350,
           350,
-          ["filler dialogue", "filler dialogue"],
+          [
+            {talk: ["Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
+            "Josh:.....",
+            "Teacher:.....",
+            "Josh: Did you seriously forget I’m blind?",
+            "Teacher:………………Yes",
+            "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
+            "Teacher: Thank you, did you remember which bookshelf?",
+            "Josh:……",
+            " Teacher: Oh, right. Sorry.",
+            // add fallen book to evidence list]
+            
+            ]
+            }
+            
+          ],
           joshNpc
         ),
+
         new NPC(
           "Cassie",
           500,
@@ -482,7 +474,6 @@ class NPC {
 
     //show dialogue optns if npc is active
     if (this.active) {
-    
       //dialogue optns box
       fill(255);
       rect(50, height - 160, width - 100, 130, 10);
@@ -498,7 +489,6 @@ class NPC {
         textWrap(WORD);
         text(`${this.name}: "${this.lastLine}"`, 70, height - 80, width - 140);
       }
-
     }
   }
 
@@ -579,8 +569,6 @@ class Tile {
     Tile.textures[1] = loadImage("Tiles/bookshelf.png");
     Tile.textures[2] = loadImage("Tiles/brown-wall-tile.png");
     Tile.textures[3] = loadImage("Tiles/door-tile.png");
-  
-
   }
 
   static draw(index, x, y) {
