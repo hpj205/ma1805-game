@@ -60,7 +60,7 @@ function draw() {
 function keyPressed() {
   // if NPC is active and keypressed is 1,2, or 3, dialogue optns
   if (game.activeNPC && ["1", "2", "3"].includes(key)) {
-    game.activeNPC.handleDialogue(key); // npc dialoge base on key
+    game.activeNPC.handleDialogue(key, game); // npc dialoge base on key
     return; // early return, stop key handling
   }
 
@@ -79,6 +79,7 @@ class Game {
     this.activeNPC = null;
     this.allBooks = [];
     this.allEvidence = [];
+    this.collectedEvidence = [];
   }
 
   setup() {
@@ -182,20 +183,24 @@ class Game {
           350,
           350,
           [
-            {talk: ["Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
-            "Josh:.....",
-            "Teacher:.....",
-            "Josh: Did you seriously forget I’m blind?",
-            "Teacher:………………Yes",
-            "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
-            "Teacher: Thank you, did you remember which bookshelf?",
-            "Josh:……",
-            " Teacher: Oh, right. Sorry.",
-            // add fallen book to evidence list]
-            
-            ]
-            }
-            
+            {
+              talk: [
+                "Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
+                "Josh:.....",
+                "Teacher:.....",
+                "Josh: Did you seriously forget I’m blind?",
+                "Teacher:………………Yes",
+                "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
+                "Teacher: Thank you, did you remember which bookshelf?",
+                "Josh:……",
+                " Teacher: Oh, right. Sorry.",
+                // add fallen book to evidence list
+              ],
+
+              alibi: [],
+              accuseGuilty: [],
+              accuseInnocent: [],
+            },
           ],
           joshNpc
         ),
@@ -296,12 +301,6 @@ class Game {
       ]
     );
 
-    //evidence added to rooms
-    this.rooms["mainRoom"].evidence.push(new Evidence("filler", 100, 200, []));
-    this.rooms["childrenLibrary"].evidence.push(
-      new Evidence("filler", 400, 300, [])
-    );
-
     for (let roomName in this.rooms) {
       this.allBooks.push(...this.rooms[roomName].books);
       this.allEvidence.push(...this.rooms[roomName].evidence);
@@ -344,6 +343,23 @@ class Game {
   // helper func to get current rm obj
   currentRoomObj() {
     return this.rooms[this.currentRoom];
+  }
+
+  //DEBUGGING
+  addEvidence(evidenceName) {
+    console.log("Attempting to add evidence:", evidenceName); // debug line
+    if (!this.collectedEvidence.includes(evidenceName)) {
+      this.collectedEvidence.push(evidenceName);
+      console.log(
+        "Successfully added evidence:",
+        evidenceName,
+        "Full list:",
+        this.collectedEvidence
+      ); // Debug line
+      this.ui.setMessage(`Found evidence: ${evidenceName}`);
+    } else {
+      console.log("Evidence already exists:", evidenceName); // debug line
+    }
   }
 }
 
@@ -439,6 +455,7 @@ class Player {
     this.grid.set(x, y);
   }
 }
+
 // NPC CLASS
 class NPC {
   constructor(name, x, y, dialogues, img = null, isGuilty = false) {
@@ -502,25 +519,54 @@ class NPC {
 
   - key handling my biggest opp
   */
-  handleDialogue(k) {
-    // branching logic depending on player input (1, 2, 3)
-    if (k === "1") {
-      // i think this is where the issue w the line is coming from
-      this.lastLine = this.dialogues.talk.shift() || "";
-    } else if (k === "2") {
-      this.lastLine = this.dialogues.alibi.shift() || "";
-    } else if (k === "3") {
-      // branch based on who is guilty
-      let isGuilty = this.name === "Cassie"; // filler thief
-      if (isGuilty) {
-        this.lastLine = this.dialogues.accuseGuilty[0];
-        this.lastLine = this.dialogues.accuseGuilty.shift() || "";
-      } else {
-        this.lastLine = this.dialogues.accuseInnocent[0];
-        this.lastLine = this.dialogues.accuseInnocent.shift() || "";
+  handleDialogue(k, game) {
+    // player choose which dialogue to use
+    let dialogueArray;
+    if (k === "1") dialogueArray = this.dialogues.talk;
+    else if (k === "2") dialogueArray = this.dialogues.alibi;
+    else if (k === "3")
+      dialogueArray = this.guilty
+        ? this.dialogues.accuseGuilty
+        : this.dialogues.accuseInnocent;
+    else {
+      this.lastLine = "I don't understand that.";
+      return;
+    }
+
+    // next line if available
+    if (dialogueArray.length > 0) {
+      this.lastLine = dialogueArray.shift();
+
+      // ah yes, a string of messy if-statements :)
+
+      if (
+        this.name === "Amalia" &&
+        this.lastLine.includes("ask that librarian")
+      ) {
+        game.addEvidence("Librarian's messy desk");
+      } else if (
+        this.name === "Josh" &&
+        this.lastLine.includes("heard some stuff falling")
+      ) {
+        game.addEvidence("Books behind bookshelves");
+      } else if (
+        this.name === "Rosalyn" &&
+        this.lastLine.includes("adorable stuffed animals")
+      ) {
+        game.addEvidence("Rosalyn was in the kids’ section");
+      } else if (
+        this.name === "Derek" &&
+        this.lastLine.includes("near the librarian’s desk")
+      ) {
+        game.addEvidence("Derek was near the librarian’s desk");
+      }else if (
+        this.name === "Cassie" &&
+        this.lastLine.includes("whole time")
+      ) {
+        game.addEvidence("Cassie hasn't moved.");
       }
     } else {
-      this.lastLine = "I don't understand that.";
+      this.lastLine = "I have nothing more to say.";
     }
   }
 }
@@ -582,7 +628,7 @@ class UI {
   constructor(game) {
     this.game = game;
     this.showInventory = false;
-    this.showEvidence - false;
+    this.showEvidence = false;
     this.message = "";
     this.messageTimer = 0;
   }
@@ -635,10 +681,10 @@ class UI {
         text("Evidence Bank:", 420, 80);
 
         // display collected evidence
-        this.game.allEvidence.forEach((evidence, i) => {
+        this.game.collectedEvidence.forEach((evidence, i) => {
           const yPos = 100 + i * 20;
-          fill(evidence.collected ? 169 : 0); // grey if collected
-          text("- " + evidence.name, 420, yPos);
+          fill(0);
+          text("- " + evidence, 420, yPos);
         });
       }
     }
@@ -657,7 +703,15 @@ class UI {
 
 //EVIDENCE CLASS
 class Evidence {
-  constructor(name, x, y, dialogues = [], evidence = [], img = null) {
+  constructor(
+    name,
+    x,
+    y,
+    dialogues = [],
+    evidence = [],
+    img = null,
+    game = null
+  ) {
     this.name = name;
     this.pos = createVector(x, y);
     this.dialogues = dialogues;
@@ -666,6 +720,7 @@ class Evidence {
     this.collected = false;
     this.active = false;
     this.lastLine = "";
+    this.game = game;
   }
   // checking if player is close
   checkProximity(player) {
@@ -677,9 +732,11 @@ class Evidence {
   collect() {
     if (!this.collected) {
       this.collected = true;
-      // this.evidence.push(this.name); // adds evidence to the evidence array
       this.game.ui.setMessage(`You collected evidence: "${this.name}"`); // feedback
+
+      return true;
     }
+    return false;
   }
 
   handleDialogue(key) {
