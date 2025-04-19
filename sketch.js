@@ -1,15 +1,11 @@
 /* == programmer notes ==
 
-problems that need fixing 
-
-- text running off screen
-- teacher dialogue not appearing
-- handleDialogue method is bugging 
--> can be fixed i just need to figure out how tf 
+problems that need fixing:
+doesn't load properly, 
 
 */
 
-//GLOBAL VARIABLES
+//    ======  ~~~ GLOBAL VARIABLES ~~~ ======
 let tileSize = 50;
 let tilesX = 14;
 let tilesY = 10;
@@ -21,10 +17,60 @@ let redBookImg, greenBookImg, blueBookImg, yellowBookImg, purpleBookImg;
 // its easier to search thru code n find them bc npcs are where all the bugs are
 let amaliaNpc, cassieNpc, derekNpc, joshNpc, libNpc, rosalynNpc, teacherNpc;
 let currentNPC = null;
-let gameState = "explore";
 let dialogueType = "";
 let dialogueIndex = 0;
 let playAgainButton;
+
+let gameState = "dialogue"; // game will start w teacher-librarian dialogue
+let teacher, librarian;
+let otherNPCs = []; //hold students
+let currentLine = 0;
+let dialogue = [
+  {
+    speaker: "librarian",
+    text: "You need to learn how to control your students!",
+  },
+  {
+    speaker: "teacher",
+    text: "Can you calm down and tell me what happened ma’am?",
+  },
+  {
+    speaker: "librarian",
+    text: "Well, I noticed that some of the books are missing, and I noticed that one of your students pocketing one of them and darting away!",
+  },
+  {
+    speaker: "teacher",
+    text: "Can you tell me which student it was so I can get it back?",
+  },
+  {
+    speaker: "librarian",
+    text: "Well, I couldn’t really see the child that well, but I know it was one of the books and the only children here currently are your students.",
+  },
+  {
+    speaker: "librarian",
+    text: "And if one of your students could steal one of my books then they all could have stolen them!",
+  },
+  {
+    speaker: "teacher",
+    text: "That’s a bit harsh to say. Could it be that some of them were misplaced?",
+  },
+  {
+    speaker: "librarian",
+    text: " Unlikely! I keep this library in tip top shape!",
+  },
+  {
+    speaker: "teacher",
+    text: "*internally*: And yet she can’t notice some of the books are on the floor",
+  },
+  {
+    speaker: "teacher",
+    text: "Teacher: *Sigh* I will interview each of my students and bring all of the missing books back",
+  },
+  {
+    speaker: "librarian",
+    text: "You better, check your book inventory, it's a list of the books that are missing. Talk to you students and add evidence to your list.",
+  },
+];
 
 //PRELOAD
 function preload() {
@@ -54,11 +100,56 @@ function draw() {
   background(220);
   game.update();
   game.display();
+
+  if (gameState === "dialogue") {
+    drawDialogue();
+  }
+}
+
+function drawDialogue() {
+  // dialogue box
+  fill(255);
+  rect(50, 400, width - 100, 150, 20);
+
+  // speaker name
+  fill(0);
+  textSize(20);
+  text(dialogue[currentLine].speaker + ":", 70, 430);
+
+  // dialogue text
+  textSize(16);
+  text(dialogue[currentLine].text, 70, 460, width - 140);
 }
 
 //KEYPRESSED FUNCTION
 function keyPressed() {
   // if NPC is active and keypressed is 1,2, or 3, dialogue optns
+  if (gameState === "dialogue" && key === " ") {
+    currentLine++;
+
+    if (currentLine >= dialogue.length) {
+      gameState = "play";
+      game.player.canMove = true; // Unlock player movement
+    }
+    return;
+  }
+
+  // only handlign game inputs when game is in "play"
+  if (gameState === "play") {
+    // NPC interaction
+    if (game.activeNPC && ["1", "2", "3"].includes(key)) {
+      game.activeNPC.handleDialogue(key, game);
+      return;
+    }
+
+    // player movement
+    game.handleInput(key);
+
+    // inventory toggle
+    if (key === "i" || key === "I") {
+      game.ui.toggleInventory();
+    }
+  }
   if (game.activeNPC && ["1", "2", "3"].includes(key)) {
     game.activeNPC.handleDialogue(key, game); // npc dialoge base on key
     return; // early return, stop key handling
@@ -90,7 +181,7 @@ class Game {
         new NPC(
           "Amalia",
           200,
-          170,
+          140,
           {
             talk: [
               "Teacher: Amalia, some of the books have gone missing, may I know where you have been?",
@@ -110,10 +201,19 @@ class Game {
         ),
         new NPC(
           "Librarian",
-          625,
-          250,
+          580,
+          220,
           {
-            talk: ["filler dialogue", "filler dialogue"],
+            talk: [
+              "Teacher: Ma’am",
+              "Librarian: What is it?",
+              "Teacher: This book here",
+              "Librarian: What of it",
+              "Teacher: Isn’t this one of the missing books",
+              "Librarian: It is certainly no-",
+              "Librarian: …………",
+              "Librarian: I’ll just put this back when I’m done reading.",
+            ],
             alibi: ["alibi"],
             accuseGuilty: ["accuse guilty"],
             accuseInnocent: ["accuse innocent"],
@@ -173,20 +273,14 @@ class Game {
         ),
       ],
       [
-        new Book(
-          "The Complete Language of Flowers",
-          redBookImg,
-          410,
-          170,
-          this
-        ),
+        new Book("The Complete Language of Flowers", redBookImg, 300, 50, this),
         new Book(
           "The Tale of the Courageous MegaGirl",
           purpleBookImg,
-          100,
-          150,
+          550,
+          250,
           this
-        )
+        ),
       ]
     );
 
@@ -196,7 +290,7 @@ class Game {
         new NPC(
           "Josh",
           350,
-          350,
+          340,
           [
             {
               talk: [
@@ -223,7 +317,7 @@ class Game {
         new NPC(
           "Cassie",
           500,
-          120,
+          100,
           {
             talk: [
               "Teacher: Cassie, can I know what kind of books you are interested in?",
@@ -257,7 +351,7 @@ class Game {
 
         new NPC(
           "Rosalyn",
-          150,
+          550,
           250,
           {
             talk: [
@@ -370,18 +464,9 @@ class Game {
 
   //DEBUGGING
   addEvidence(evidenceName) {
-    console.log("Attempting to add evidence:", evidenceName); // debug line
     if (!this.collectedEvidence.includes(evidenceName)) {
       this.collectedEvidence.push(evidenceName);
-      console.log(
-        "Successfully added evidence:",
-        evidenceName,
-        "Full list:",
-        this.collectedEvidence
-      ); // Debug line
-      this.ui.setMessage(`Found evidence: ${evidenceName}`);
-    } else {
-      console.log("Evidence already exists:", evidenceName); // debug line
+      this.ui.setMessage(`found evidence: ${evidenceName}`);
     }
   }
 }
@@ -425,6 +510,7 @@ class Player {
   constructor(x, y) {
     this.grid = createVector(x, y);
     this.sprite = teacherNpc;
+    this.canMove = false; // player starts locked
   }
 
   display() {
@@ -437,17 +523,12 @@ class Player {
         40, //width
         60 //height
       );
-    } else {
-      fill(208, 247, 255);
-      ellipse(
-        this.grid.x * tileSize + tileSize / 2,
-        this.grid.y * tileSize + tileSize / 2,
-        40
-      );
     }
   }
 
   handleInput(k, room) {
+    if (!this.canMove) return;
+
     let dx = 0,
       dy = 0;
     // WASD movement cuz duhh
@@ -532,16 +613,6 @@ class NPC {
     }
   }
 
-  /* refactored again 16-04
-
-  issues were 
-  -- dialogue structure: im stupid and used string arrays for some dialogues
-  and objects for some but the method wld assume objects for all npcs bc im stupid
-  
-  - using shift() was a mistake it just boots the element off my dialogue array 
-
-  - key handling my biggest opp
-  */
   handleDialogue(k, game) {
     // player choose which dialogue to use
     let dialogueArray;
@@ -627,7 +698,6 @@ class Book {
     blueBookImg = loadImage("Tiles/blue-book.png");
     purpleBookImg = loadImage("Tiles/purple-book.png");
     yellowBookImg = loadImage("Tiles/yellow-book.png");
-    //create more book sprites
   }
 }
 
@@ -640,6 +710,8 @@ class Tile {
     Tile.textures[1] = loadImage("Tiles/bookshelf.png");
     Tile.textures[2] = loadImage("Tiles/brown-wall-tile.png");
     Tile.textures[3] = loadImage("Tiles/door-tile.png");
+    Tile.textures[4] = loadImage("Tiles/front-desk1.png"); //top half of desk
+    Tile.textures[5] = loadImage("Tiles/front-desk2.png"); //bottom half
   }
 
   static draw(index, x, y) {
@@ -659,7 +731,7 @@ class UI {
   }
 
   createInventoryButton() {
-    this.inventoryButton = createButton("Book Inventory");
+    this.inventoryButton = createButton("Books to find");
     this.inventoryButton.position(300, 50);
     this.inventoryButton.mousePressed(() => this.toggleInventory());
   }
@@ -687,7 +759,7 @@ class UI {
   display() {
     if (this.showInventory) {
       fill(255);
-      rect(50, 50, 300, 150, 10);
+      rect(50, 50, 460, 150, 10);
       fill(0);
       textSize(16);
       text("Inventory:", 70, 80);
@@ -793,16 +865,16 @@ class Evidence {
 
 // MAPS
 let mainRoomMap = [
-  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-  [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2],
-  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], //1
+  [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3, 2], //2
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //3
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //4
+  [2, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 4, 0, 2], //5
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 2], //6
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //7
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //8
+  [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2], //9
+  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], //10
 ];
 
 let childrenLibraryMap = [
