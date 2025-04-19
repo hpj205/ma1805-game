@@ -16,7 +16,7 @@ let tilesY = 10;
 
 let game; // game obj
 
-let redBookImg, greenBookImg, blueBookImg;
+let redBookImg, greenBookImg, blueBookImg, yellowBookImg, purpleBookImg;
 // "why'd you call them nameNPC instead of just name?"
 // its easier to search thru code n find them bc npcs are where all the bugs are
 let amaliaNpc, cassieNpc, derekNpc, joshNpc, libNpc, rosalynNpc, teacherNpc;
@@ -172,7 +172,22 @@ class Game {
           derekNpc
         ),
       ],
-      [new Book("", redBookImg, 410, 170, this)]
+      [
+        new Book(
+          "The Complete Language of Flowers",
+          redBookImg,
+          410,
+          170,
+          this
+        ),
+        new Book(
+          "The Tale of the Courageous MegaGirl",
+          purpleBookImg,
+          100,
+          150,
+          this
+        )
+      ]
     );
 
     this.rooms["childrenLibrary"] = new Room(
@@ -296,6 +311,14 @@ class Game {
           blueBookImg,
           5 * tileSize + tileSize / 2,
           3 * tileSize + tileSize / 2,
+          this
+        ),
+
+        new Book(
+          "Glasses Jones and the Elusive Emerald",
+          yellowBookImg,
+          5 * tileSize + tileSize / 2 + 10,
+          3 * tileSize + tileSize / 2 + 10,
           this
         ),
       ]
@@ -559,7 +582,7 @@ class NPC {
         this.lastLine.includes("near the librarian’s desk")
       ) {
         game.addEvidence("Derek was near the librarian’s desk");
-      }else if (
+      } else if (
         this.name === "Cassie" &&
         this.lastLine.includes("whole time")
       ) {
@@ -602,6 +625,8 @@ class Book {
     redBookImg = loadImage("Tiles/red-book.png");
     greenBookImg = loadImage("Tiles/green-book.png");
     blueBookImg = loadImage("Tiles/blue-book.png");
+    purpleBookImg = loadImage("Tiles/purple-book.png");
+    yellowBookImg = loadImage("Tiles/yellow-book.png");
     //create more book sprites
   }
 }
