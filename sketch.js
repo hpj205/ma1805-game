@@ -712,6 +712,7 @@ class Tile {
     Tile.textures[3] = loadImage("Tiles/door-tile.png");
     Tile.textures[4] = loadImage("Tiles/front-desk1.png"); //top half of desk
     Tile.textures[5] = loadImage("Tiles/front-desk2.png"); //bottom half
+    Tile.textures[6]= loadImage("Tiles/toy-tile.png")
   }
 
   static draw(index, x, y) {
@@ -884,7 +885,7 @@ let childrenLibraryMap = [
   [2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2],
   [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 2],
   [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2],
   [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
