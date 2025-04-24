@@ -150,7 +150,7 @@ Amalia:
 
 Josh:
     Teacher: Josh some of the books went missing, may I ask if you have seen any of them?
-    Josh:
+    Josh:...
     Teacher:
     Josh:
     Teacher:
