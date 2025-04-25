@@ -1,27 +1,76 @@
 /* == programmer notes ==
 
-fml
+problems that need fixing:
+doesn't load properly, 
 
+*/
 
- */
-
-//GLOBAL VARIABLES
+//    ======  ~~~ GLOBAL VARIABLES ~~~ ======
 let tileSize = 50;
 let tilesX = 14;
 let tilesY = 10;
 
 let game; // game obj
 
-let redBookImg, greenBookImg, blueBookImg;
+let redBookImg, greenBookImg, blueBookImg, yellowBookImg, purpleBookImg;
 // "why'd you call them nameNPC instead of just name?"
 // its easier to search thru code n find them bc npcs are where all the bugs are
 let amaliaNpc, cassieNpc, derekNpc, joshNpc, libNpc, rosalynNpc, teacherNpc;
-
 let currentNPC = null;
-let gameState = "explore";
 let dialogueType = "";
 let dialogueIndex = 0;
 let playAgainButton;
+
+let gameState = "dialogue"; // game will start w teacher-librarian dialogue
+let teacher, librarian;
+let otherNPCs = []; //hold students
+let currentLine = 0;
+let dialogue = [
+  {
+    speaker: "librarian",
+    text: "You need to learn how to control your students!",
+  },
+  {
+    speaker: "teacher",
+    text: "Can you calm down and tell me what happened ma’am?",
+  },
+  {
+    speaker: "librarian",
+    text: "Well, I noticed that some of the books are missing, and I noticed that one of your students pocketing one of them and darting away!",
+  },
+  {
+    speaker: "teacher",
+    text: "Can you tell me which student it was so I can get it back?",
+  },
+  {
+    speaker: "librarian",
+    text: "Well, I couldn’t really see the child that well, but I know it was one of the books and the only children here currently are your students.",
+  },
+  {
+    speaker: "librarian",
+    text: "And if one of your students could steal one of my books then they all could have stolen them!",
+  },
+  {
+    speaker: "teacher",
+    text: "That’s a bit harsh to say. Could it be that some of them were misplaced?",
+  },
+  {
+    speaker: "librarian",
+    text: " Unlikely! I keep this library in tip top shape!",
+  },
+  {
+    speaker: "teacher",
+    text: "*internally*: And yet she can’t notice some of the books are on the floor",
+  },
+  {
+    speaker: "teacher",
+    text: "Teacher: *Sigh* I will interview each of my students and bring all of the missing books back",
+  },
+  {
+    speaker: "librarian",
+    text: "You better, check your book inventory, it's a list of the books that are missing. Talk to you students and add evidence to your list.",
+  },
+];
 
 //PRELOAD
 function preload() {
@@ -51,13 +100,58 @@ function draw() {
   background(220);
   game.update();
   game.display();
+
+  if (gameState === "dialogue") {
+    drawDialogue();
+  }
+}
+
+function drawDialogue() {
+  // dialogue box
+  fill(255);
+  rect(50, 400, width - 100, 150, 20);
+
+  // speaker name
+  fill(0);
+  textSize(20);
+  text(dialogue[currentLine].speaker + ":", 70, 430);
+
+  // dialogue text
+  textSize(16);
+  text(dialogue[currentLine].text, 70, 460, width - 140);
 }
 
 //KEYPRESSED FUNCTION
 function keyPressed() {
   // if NPC is active and keypressed is 1,2, or 3, dialogue optns
+  if (gameState === "dialogue" && key === " ") {
+    currentLine++;
+
+    if (currentLine >= dialogue.length) {
+      gameState = "play";
+      game.player.canMove = true; // Unlock player movement
+    }
+    return;
+  }
+
+  // only handlign game inputs when game is in "play"
+  if (gameState === "play") {
+    // NPC interaction
+    if (game.activeNPC && ["1", "2", "3"].includes(key)) {
+      game.activeNPC.handleDialogue(key, game);
+      return;
+    }
+
+    // player movement
+    game.handleInput(key);
+
+    // inventory toggle
+    if (key === "i" || key === "I") {
+      game.ui.toggleInventory();
+    }
+  }
   if (game.activeNPC && ["1", "2", "3"].includes(key)) {
-    game.activeNPC.handleDialogue(key); // npc dialoge base on key
+    game.activeNPC.handleDialogue(key, game); // npc dialoge base on key
     return; // early return, stop key handling
   }
 
@@ -76,6 +170,7 @@ class Game {
     this.activeNPC = null;
     this.allBooks = [];
     this.allEvidence = [];
+    this.collectedEvidence = [];
   }
 
   setup() {
@@ -94,13 +189,45 @@ class Game {
             "Amalia: Jeez, if you want to interrogate anyone with a book, ask that librarian. I haven’t been here long, but she seems really disorganized, maybe some of the books on her desk are the missing books.",
             "Teacher *internally*: Well she’s not wrong.",],
             //This adds to evidence list to check the librarian's desk to search for missing books
+          140,
+          {
+            talk: [
+              "Teacher: Amalia, some of the books have gone missing, may I know where you have been?",
+              "Amalia: Sorry teach, but I’ve been here the whole time reading this book I checked out, see?",
+              "(You look on the back of the cover, noting that the book is indeed stamped with Amalia’s name on it)",
+              "Teacher: Ok then, thank you Amalia.",
+              "Amalia: Jeez, if you want to interrogate anyone with a book, ask that librarian. I haven’t been here long, but she seems really disorganized, maybe some of the books on her desk are the missing books.",
+              "Teacher *internally*: Well she’s not wrong.",
+              //ADDS EVIDENCE: LIBRARIANS DESK
+            ],
+            alibi: ["Amalia does not need an alibi"],
+            accuseGuilty: ["You cannot accuse Amalia"],
+            accuseInnocent: ["You cannot accuse Amalia"],
+          },
+
+
           amaliaNpc
         ),
         new NPC(
           "Librarian",
-          625,
-          250,
-          ["Please whisper.", "We *will* throw you out."],
+          580,
+          220,
+          {
+            talk: [
+              "Teacher: Ma’am",
+              "Librarian: What is it?",
+              "Teacher: This book here",
+              "Librarian: What of it",
+              "Teacher: Isn’t this one of the missing books",
+              "Librarian: It is certainly no-",
+              "Librarian: …………",
+              "Librarian: I’ll just put this back when I’m done reading.",
+            ],
+            alibi: ["alibi"],
+            accuseGuilty: ["accuse guilty"],
+            accuseInnocent: ["accuse innocent"],
+          },
+
           libNpc
         ),
 
@@ -111,9 +238,9 @@ class Game {
           {
             talk: [
               "Teacher: Derek, can I know what kind of books you are interested in?",
-               "Derek: Ah, are you trying to find out my motivation dear teacher? Well as you should know, as an amazing detective, I only read mystery novels and science books to hone my skills.",
-               "Teacher: …... That sounds nice Derek.",
-              "Teacher *Internally*: Man, this kid is weird"
+              "Derek: Ah, are you trying to find out my motivation dear teacher? Well as you should know, as an amazing detective, I only read mystery novels and science books to hone my skills.",
+              "Teacher: …... That sounds nice Derek.",
+              "Teacher *Internally*: Man, this kid is weird",
             ],
             alibi: [
               "Teacher: Derek, can I ask you something?",
@@ -147,14 +274,23 @@ class Game {
               " Teacher:.....",
               "Derek: I told you! You doubted my abilities as the greatest detective!",
               "Librarian:......",
-              " Librarian: To be honest he’s right, I should have tasked him to find the books not you",
+              "Librarian: To be honest he’s right, I should have tasked him to find the books not you",
               "Teacher: SHUT UP! BOTH OF YOU",
-            ]
+            ],
           },
           derekNpc
         ),
       ],
-      [new Book("Gardening Book", redBookImg, 410, 170, this)]
+      [
+        new Book("The Complete Language of Flowers", redBookImg, 300, 50, this),
+        new Book(
+          "The Tale of the Courageous MegaGirl",
+          purpleBookImg,
+          550,
+          250,
+          this
+        ),
+      ]
     );
 
     this.rooms["childrenLibrary"] = new Room(
@@ -175,22 +311,45 @@ class Game {
             "Josh:...",
             "Teacher: Oh, right. Sorry."],
             //This adds to the evidence list that some of the missing books are behind the shelves
+          340,
+          [
+            {
+              talk: [
+                "Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
+                "Josh:.....",
+                "Teacher:.....",
+                "Josh: Did you seriously forget I’m blind?",
+                "Teacher:………………Yes",
+                "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
+                "Teacher: Thank you, did you remember which bookshelf?",
+                "Josh:……",
+                " Teacher: Oh, right. Sorry.",
+                // add fallen book to evidence list
+              ],
+
+              alibi: [],
+              accuseGuilty: [],
+              accuseInnocent: [],
+            },
+          ],
+
           joshNpc
         ),
+
         new NPC(
           "Cassie",
           500,
-          120,
+          100,
           {
             talk: [
               "Teacher: Cassie, can I know what kind of books you are interested in?",
               "Cassie: O-oh w-well, I want t-to learn how to become more confident and b-braver...",
-              "Teacher: That sounds very nice."
+              "Teacher: That sounds very nice.",
             ],
             alibi: [
               "Teacher: Cassie, can I know where you were in the past few minutes, one of the library’s books have gone missing.",
               "Cassie: O-oh, s-s-sorry ma’am, I’ve been here t-the whole time, lo-looking at the t-titles of the b-books",
-              "Teacher: Thank you, Cassie."
+              "Teacher: Thank you, Cassie.",
             ],
             accuseGuilty: [
               "Teacher: Cassie can you please empty out your pockets",
@@ -198,7 +357,7 @@ class Game {
               "Teacher: Cassie, please.",
               "Cassie silently pulls out the book.",
               "Teacher: I’m not mad, but you should know it isn’t right to steal...",
-              "Cassie: Okay."
+              "Cassie: Okay.",
             ],
             accuseInnocent: [
               "Teacher: Cassie can you please empty out your pockets",
@@ -206,41 +365,79 @@ class Game {
               "Teacher: Cassie, please.",
               "(Cassie’s pockets are empty)",
               "Librarian: Wow you’re a bad teacher.",
-              "Teacher: SHUT UP!"
-            ]
+              "Teacher: SHUT UP!",
+            ],
           },
           cassieNpc
         ),
 
         new NPC(
           "Rosalyn",
-          150,
+          550,
           250,
-          [
-            "Well, I was here in the kids’ section with all of the adorable stuffed animals. There so cute and soft!",
-            "Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that.",
-          ],
+          {
+            talk: [
+              "Teacher: Rosalyn, can I know what kind of books you are interested in?",
+              "Rosalyn: Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that",
+              "Teacher: That sounds very lovely Rosalyn.",
+            ],
+
+            alibi: [
+              "Teacher: Rosalyn, can I ask you something?",
+              "Rosalyn: Of course, what is it?",
+              "Teacher: I need to know where exactly you’ve been for the past few minutes, one of the library’s books has gone missing",
+              "Rosalyn: Well, I was here in the kids’ section with all of the adorable stuffed animals. They're so cute and soft!",
+              "Teacher: Thank you",
+
+              //ADDS EVIDENCE: ROSYALN WAS IN THE KIDS SECTION W/ STUFFIES
+            ],
+            accuseGuilty: [
+              "Teacher: Rosalyn can you please empty out your pockets",
+              "Rosalyn: HUH!? But why!",
+              "Teacher: Rosalyn, please.",
+              "(Rosalyn silently pulls out the book)",
+              "Teacher: I’m not mad, but you should know it isn’t right to steal. Let’s go get this book checked out together, ok?",
+              "Rosalyn: *Sigh* Alright. I’m very sorry",
+            ],
+            accuseInnocent: [
+              "Teacher: Rosalyn can you please empty out your pockets",
+              "Rosalyn: Huh? Why? I didn’t steal anything!",
+              "Teacher: Rosalyn, please.",
+              "(Rosalyn’s pockets are empty)",
+              "Teacher:",
+              "Rosalyn:",
+              "Librarian:",
+              "Librarian: Wow you’re a bad teacher",
+              "Teacher: SHUT UP!",
+            ],
+          },
           rosalynNpc
         ),
       ],
       [
-        new Book("Cheap Recipes", greenBookImg, 250, 170, this),
         new Book(
-          "How to Inconvenience...",
+          "The Elf Princess and the Last Dragon",
+          greenBookImg,
+          250,
+          170,
+          this
+        ),
+        new Book(
+          "Starlight Explorers: Journey to the Cosmic Fair",
           blueBookImg,
           5 * tileSize + tileSize / 2,
           3 * tileSize + tileSize / 2,
           this
         ),
-      ]
-    );
 
-    //evidence added to rooms
-    this.rooms["mainRoom"].evidence.push(
-      new Evidence("Gardening Tips", 100, 200, [])
-    );
-    this.rooms["childrenLibrary"].evidence.push(
-      new Evidence("Cheap Recipes", 400, 300, [])
+        new Book(
+          "Glasses Jones and the Elusive Emerald",
+          yellowBookImg,
+          5 * tileSize + tileSize / 2 + 10,
+          3 * tileSize + tileSize / 2 + 10,
+          this
+        ),
+      ]
     );
 
     for (let roomName in this.rooms) {
@@ -286,6 +483,14 @@ class Game {
   currentRoomObj() {
     return this.rooms[this.currentRoom];
   }
+
+  //DEBUGGING
+  addEvidence(evidenceName) {
+    if (!this.collectedEvidence.includes(evidenceName)) {
+      this.collectedEvidence.push(evidenceName);
+      this.ui.setMessage(`found evidence: ${evidenceName}`);
+    }
+  }
 }
 
 // ROOM CLASS
@@ -327,6 +532,7 @@ class Player {
   constructor(x, y) {
     this.grid = createVector(x, y);
     this.sprite = teacherNpc;
+    this.canMove = false; // player starts locked
   }
 
   display() {
@@ -339,17 +545,12 @@ class Player {
         40, //width
         60 //height
       );
-    } else {
-      fill(208, 247, 255);
-      ellipse(
-        this.grid.x * tileSize + tileSize / 2,
-        this.grid.y * tileSize + tileSize / 2,
-        40
-      );
     }
   }
 
   handleInput(k, room) {
+    if (!this.canMove) return;
+
     let dx = 0,
       dy = 0;
     // WASD movement cuz duhh
@@ -380,15 +581,17 @@ class Player {
     this.grid.set(x, y);
   }
 }
+
 // NPC CLASS
 class NPC {
-  constructor(name, x, y, dialogues, img = null) {
+  constructor(name, x, y, dialogues, img = null, isGuilty = false) {
     this.name = name;
     this.pos = createVector(x, y);
     this.dialogues = dialogues;
     this.active = false;
     this.lastLine = ""; // store last dialogue line
     this.img = img;
+    this.guilty = isGuilty;
   }
 
   checkProximity(player) {
@@ -414,26 +617,72 @@ class NPC {
 
     //show dialogue optns if npc is active
     if (this.active) {
+      //dialogue optns box
       fill(255);
-      rect(50, height - 140, 600, 120, 10);
+      rect(50, height - 160, width - 100, 130, 10);
       fill(0);
       textSize(14);
+      textFont("monospace");
       text("1. Talk    2. Alibi    3. Accuse", 70, height - 110);
 
       // display NPCS last line of dialogue
       if (this.lastLine) {
         textSize(16);
-        text(`${this.name}: "${this.lastLine}"`, 70, height - 80);
+        fill(0);
+        textWrap(WORD);
+        text(`${this.name}: "${this.lastLine}"`, 70, height - 80, width - 140);
       }
     }
   }
-  // self explanatory...
-  handleDialogue(k) {
-    const idx = parseInt(k) - 1;
-    if (idx >= 0 && idx < this.dialogues.length) {
-      this.lastLine = this.dialogues[idx];
-    } else {
+
+  handleDialogue(k, game) {
+    // player choose which dialogue to use
+    let dialogueArray;
+    if (k === "1") dialogueArray = this.dialogues.talk;
+    else if (k === "2") dialogueArray = this.dialogues.alibi;
+    else if (k === "3")
+      dialogueArray = this.guilty
+        ? this.dialogues.accuseGuilty
+        : this.dialogues.accuseInnocent;
+    else {
       this.lastLine = "I don't understand that.";
+      return;
+    }
+
+    // next line if available
+    if (dialogueArray.length > 0) {
+      this.lastLine = dialogueArray.shift();
+
+      // ah yes, a string of messy if-statements :)
+
+      if (
+        this.name === "Amalia" &&
+        this.lastLine.includes("ask that librarian")
+      ) {
+        game.addEvidence("Librarian's messy desk");
+      } else if (
+        this.name === "Josh" &&
+        this.lastLine.includes("heard some stuff falling")
+      ) {
+        game.addEvidence("Books behind bookshelves");
+      } else if (
+        this.name === "Rosalyn" &&
+        this.lastLine.includes("adorable stuffed animals")
+      ) {
+        game.addEvidence("Rosalyn was in the kids’ section");
+      } else if (
+        this.name === "Derek" &&
+        this.lastLine.includes("near the librarian’s desk")
+      ) {
+        game.addEvidence("Derek was near the librarian’s desk");
+      } else if (
+        this.name === "Cassie" &&
+        this.lastLine.includes("whole time")
+      ) {
+        game.addEvidence("Cassie hasn't moved.");
+      }
+    } else {
+      this.lastLine = "I have nothing more to say.";
     }
   }
 }
@@ -466,9 +715,11 @@ class Book {
   }
 
   static loadImages() {
-    redBookImg = loadImage("red-book.png");
-    greenBookImg = loadImage("green-book.png");
-    blueBookImg = loadImage("blue-book.png");
+    redBookImg = loadImage("Tiles/red-book.png");
+    greenBookImg = loadImage("Tiles/green-book.png");
+    blueBookImg = loadImage("Tiles/blue-book.png");
+    purpleBookImg = loadImage("Tiles/purple-book.png");
+    yellowBookImg = loadImage("Tiles/yellow-book.png");
   }
 }
 
@@ -477,10 +728,13 @@ class Book {
 class Tile {
   static loadTextures() {
     Tile.textures = [];
-    Tile.textures[0] = loadImage("floor-tile.png");
-    Tile.textures[1] = loadImage("bookshelf.png");
-    Tile.textures[2] = loadImage("brown-wall-tile.png");
-    Tile.textures[3] = loadImage("door-tile.png");
+    Tile.textures[0] = loadImage("Tiles/floor-tile.png");
+    Tile.textures[1] = loadImage("Tiles/bookshelf.png");
+    Tile.textures[2] = loadImage("Tiles/brown-wall-tile.png");
+    Tile.textures[3] = loadImage("Tiles/door-tile.png");
+    Tile.textures[4] = loadImage("Tiles/front-desk1.png"); //top half of desk
+    Tile.textures[5] = loadImage("Tiles/front-desk2.png"); //bottom half
+    Tile.textures[6]= loadImage("Tiles/toy-tile.png")
   }
 
   static draw(index, x, y) {
@@ -494,13 +748,13 @@ class UI {
   constructor(game) {
     this.game = game;
     this.showInventory = false;
-    this.showEvidence - false;
+    this.showEvidence = false;
     this.message = "";
     this.messageTimer = 0;
   }
 
   createInventoryButton() {
-    this.inventoryButton = createButton("Book Inventory");
+    this.inventoryButton = createButton("Books to find");
     this.inventoryButton.position(300, 50);
     this.inventoryButton.mousePressed(() => this.toggleInventory());
   }
@@ -528,7 +782,7 @@ class UI {
   display() {
     if (this.showInventory) {
       fill(255);
-      rect(50, 50, 300, 150, 10);
+      rect(50, 50, 460, 150, 10);
       fill(0);
       textSize(16);
       text("Inventory:", 70, 80);
@@ -547,10 +801,10 @@ class UI {
         text("Evidence Bank:", 420, 80);
 
         // display collected evidence
-        this.game.allEvidence.forEach((evidence, i) => {
+        this.game.collectedEvidence.forEach((evidence, i) => {
           const yPos = 100 + i * 20;
-          fill(evidence.collected ? 169 : 0); // grey if collected
-          text("- " + evidence.name, 420, yPos);
+          fill(0);
+          text("- " + evidence, 420, yPos);
         });
       }
     }
@@ -569,7 +823,15 @@ class UI {
 
 //EVIDENCE CLASS
 class Evidence {
-  constructor(name, x, y, dialogues = [], evidence = [], img = null) {
+  constructor(
+    name,
+    x,
+    y,
+    dialogues = [],
+    evidence = [],
+    img = null,
+    game = null
+  ) {
     this.name = name;
     this.pos = createVector(x, y);
     this.dialogues = dialogues;
@@ -578,6 +840,7 @@ class Evidence {
     this.collected = false;
     this.active = false;
     this.lastLine = "";
+    this.game = game;
   }
   // checking if player is close
   checkProximity(player) {
@@ -589,9 +852,11 @@ class Evidence {
   collect() {
     if (!this.collected) {
       this.collected = true;
-      // this.evidence.push(this.name); // adds evidence to the evidence array
       this.game.ui.setMessage(`You collected evidence: "${this.name}"`); // feedback
+
+      return true;
     }
+    return false;
   }
 
   handleDialogue(key) {
@@ -623,16 +888,16 @@ class Evidence {
 
 // MAPS
 let mainRoomMap = [
-  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-  [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 2],
-  [2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 2, 2, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2],
-  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], //1
+  [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3, 2], //2
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //3
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //4
+  [2, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 4, 0, 2], //5
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 2], //6
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //7
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], //8
+  [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2], //9
+  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], //10
 ];
 
 let childrenLibraryMap = [
@@ -642,7 +907,7 @@ let childrenLibraryMap = [
   [2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2],
   [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 2],
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 2],
   [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2],
   [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
