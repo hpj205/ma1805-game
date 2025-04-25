@@ -182,13 +182,8 @@ class Game {
           "Amalia",
           200,
           170,
-          ["Teacher: Amalia, some of the books have gone missing, may I know where you have been?", 
-            "Amalia: Sorry teach, but I’ve been here the whole time reading this book I checked out, see?",
-            "(You look on the back of the cover, noting that the book is indeed stamped with Amalia’s name on it)",
-            "Teacher: Ok then, thank you Amalia.",
-            "Amalia: Jeez, if you want to interrogate anyone with a book, ask that librarian. I haven’t been here long, but she seems really disorganized, maybe some of the books on her desk are the missing books.",
-            "Teacher *internally*: Well she’s not wrong.",],
-            //This adds to evidence list to check the librarian's desk to search for missing books
+          
+            
           140,
           {
             talk: [
@@ -300,17 +295,8 @@ class Game {
           "Josh",
           350,
           350,
-          ["Teacher: Josh some of the books went missing, may I ask if you have seen any of them?", 
-            "Josh:...",
-            "Teacher:...",
-            "Josh:...Did you seriously forget that I'm BLIND?!",
-            "Teacher:...",
-            "Teacher: I'll be honest, yes.",
-            "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
-            "Teacher: Thank you, did you remember which bookshelf?",
-            "Josh:...",
-            "Teacher: Oh, right. Sorry."],
-            //This adds to the evidence list that some of the missing books are behind the shelves
+         
+    
           340,
           [
             {
