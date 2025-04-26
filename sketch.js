@@ -89,6 +89,7 @@ function preload() {
 //SET UP
 function setup() {
   createCanvas(700, 500);
+
   gameFont = "monospace";
   textFont(gameFont);
   game = new Game();
@@ -453,7 +454,7 @@ class Game {
     let tile = this.currentRoomObj().getTile(this.player.grid);
     if (tile === 3) {
       this.currentRoom =
-        this.currentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
+        this.currAentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
       this.player.setPosition(3, 5);
     }
   }
