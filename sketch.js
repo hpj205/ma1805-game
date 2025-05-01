@@ -11,6 +11,7 @@ let tilesX = 14;
 let tilesY = 10;
 
 let game; // game obj
+let gameOver = false;
 
 let redBookImg, greenBookImg, blueBookImg, yellowBookImg, purpleBookImg;
 // "why'd you call them nameNPC instead of just name?"
@@ -137,13 +138,15 @@ function draw() {
     drawTitleScreen();
   } else if (gameState === "controls") {
     drawControlsScreen();
+  }else if (gameState === "gameover"){
+    drawGameOverScreen();
   } else if (gameState === "game"|| gameState === "dialogue") {
     game.update();
     game.display();
 
     if (gameState === "dialogue") {
       game.display();
-      drawDialogue();
+     if (gameState === "dialogue") drawDialogue();
     }
   }
 }
@@ -182,6 +185,24 @@ function drawDialogue() {
   textSize(16);
   text(dialogue[currentLine].text, 70, 460, width - 140);
 }
+//game over
+function drawGameOverScreen() {
+  background(0);
+  fill(255);
+  textSize(40);
+  textAlign(CENTER);
+  text("CASE SOLVED!", width/2, height/2);
+  textSize(20);
+  text("Derek was stealing books", width/2, height/2 + 50);
+  
+  // restart button
+  if (!playAgainButton) {
+    playAgainButton = createButton("Play Again");
+    playAgainButton.position(width/2 - 50, height/2 + 100);
+    playAgainButton.mousePressed(resetGame);
+  }
+  playAgainButton.show();
+}
 
 //KEYPRESSED FUNCTION
 function keyPressed() {
@@ -217,6 +238,17 @@ function keyPressed() {
   }
 
   game.handleInput(key); // otherwise handle playr input
+}
+
+//reset game function
+function resetGame() {
+  gameOver = false;
+  game = new Game();
+  game.setup();
+  gameState = "title";
+  if (playAgainButton) playAgainButton.hide();
+  startButton.show();
+  controlsButton.show();
 }
 
 // GAME CLASS
@@ -330,18 +362,9 @@ class Game {
               "Teacher: I know you wanted to help but doing something wrong won’t make it become right",
               "Derek: Ok, I’m sorry",
               "Teacher: It’s alright as long as you know",
+              "GAME OVER",
             ],
-            accuseInnocent: [
-              "Teacher: Derek can you please empty out your pockets",
-              "Derek: What?! But I’m the detective! I couldn’t steal something!",
-              "Teacher: Derek, please.",
-              "(Derek’s pockets are empty)",
-              " Teacher:.....",
-              "Derek: I told you! You doubted my abilities as the greatest detective!",
-              "Librarian:......",
-              "Librarian: To be honest he’s right, I should have tasked him to find the books not you",
-              "Teacher: SHUT UP! BOTH OF YOU",
-            ],
+            
           },
           derekNpc,
           true // derek is guiLTY
@@ -745,6 +768,11 @@ class NPC {
     } else {
       this.lastLine = "I have nothing more to say.";
     }
+    //game over
+if (this.lastLine.includes("GAME OVER")) {
+  gameOver = true;
+  gameState = "gameover";
+}
   }
 }
 
