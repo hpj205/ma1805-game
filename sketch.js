@@ -20,8 +20,9 @@ let currentNPC = null;
 let dialogueType = "";
 let dialogueIndex = 0;
 let playAgainButton;
+let startButton, controlsButton, backButton;
 
-let gameState = "dialogue"; // game will start w teacher-librarian dialogue
+let gameState = "title"; // game will start w title page
 let teacher, librarian;
 let otherNPCs = []; //hold students
 let currentLine = 0;
@@ -94,17 +95,76 @@ function setup() {
   textFont(gameFont);
   game = new Game();
   game.setup();
+
+  //start button
+  startButton = createButton("start game");
+  startButton.position(width / 2 - 50, height / 2);
+  startButton.mousePressed(() => {
+    gameState = "game";
+    startButton.hide();
+    controlsButton.hide();
+    if (backButton) backButton.hide();
+  });
+
+  //controls like deleuze
+
+  controlsButton = createButton("controls");
+  controlsButton.position(width / 2 - 50, height / 2 + 40);
+  controlsButton.mousePressed(() => {
+    gameState = "controls";
+    startButton.hide();
+    controlsButton.hide();
+    backButton.show();
+  });
+
+  backButton = createButton("Back");
+  backButton.position(20, 20);
+  backButton.mousePressed(() => {
+    gameState = "title";
+    startButton.show();
+    controlsButton.show();
+    backButton.hide();
+  });
+  backButton.hide();
 }
 
 //DRAW FUNCTION
 function draw() {
+  
+
+if (gameState === "title"){
+  drawTitleScreen();
+} else if (gameState === "controls"){
+  drawControlsScreen();
+ } else if (gameState === "game"){
+  drawGame();
   background(220);
   game.update();
   game.display();
-
-  if (gameState === "dialogue") {
+ }else if (gameState === "dialogue"){
     drawDialogue();
+    drawGame();
+  background(220);
+  game.update();
+  game.display();
   }
+ 
+ }
+ function drawTitleScreen() {
+  textAlign(CENTER);
+  textSize(40);
+  fill(50);
+  text("Library Theft", width / 2, height / 3);
+}
+
+function drawControlsScreen() {
+  textAlign(LEFT);
+  textSize(20);
+  fill(0);
+  text("controls:", 40, 80);
+  text("WASD to move", 40, 110);
+  text("-Use Spacebar to navigate cutscene, Press 1 repeatedly to Talk, 2 repeatedly to Ask for Alibi, 3 repeatedly to Accuse", 40, 140);
+  text("- Use mouse for UI buttons", 40, 170);
 }
 
 function drawDialogue() {
@@ -183,8 +243,7 @@ class Game {
           "Amalia",
           200,
           170,
-          
-            
+
           140,
           {
             talk: [
@@ -200,7 +259,6 @@ class Game {
             accuseGuilty: ["You cannot accuse Amalia"],
             accuseInnocent: ["You cannot accuse Amalia"],
           },
-
 
           amaliaNpc
         ),
@@ -220,18 +278,18 @@ class Game {
               "Librarian: I’ll just put this back when I’m done reading.",
             ],
             alibi: [
-             "Teacher: Ma’am?",
-             "Librarian: *Grumpily* What is it now?",
-             "Teacher: Can I ask you a few questions abput what you saw happen?",
-             "",
-             " Librarian: YOU CALLIN’ ME A LIAR?!?!",
-             "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
-            "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
-            "BUT I KNOW I saw with my two own eyes from across the library!",
-          "Teacher: So, the culprit wasn’t anywhere near you?",
-          "Librarian: Yes, the only time anyone came near my desk was near the beginning of this class trip when that girl sitting at that table checked out that book she’s still currently reading.",
-    // ADD EVIDENCE
-              ],
+              "Teacher: Ma’am?",
+              "Librarian: *Grumpily* What is it now?",
+              "Teacher: Can I ask you a few questions abput what you saw happen?",
+              "",
+              " Librarian: YOU CALLIN’ ME A LIAR?!?!",
+              "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
+              "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
+              "BUT I KNOW I saw with my two own eyes from across the library!",
+              "Teacher: So, the culprit wasn’t anywhere near you?",
+              "Librarian: Yes, the only time anyone came near my desk was near the beginning of this class trip when that girl sitting at that table checked out that book she’s still currently reading.",
+              // ADD EVIDENCE
+            ],
             accuseGuilty: ["You can't accuse Librarian."],
             accuseInnocent: ["You can't accuse Librarian."],
           },
@@ -308,8 +366,7 @@ class Game {
           "Josh",
           350,
           350,
-         
-    
+
           340,
           [
             {
@@ -674,12 +731,13 @@ class NPC {
         this.lastLine.includes("near the librarian’s desk")
       ) {
         game.addEvidence("Derek was near the librarian’s desk");
-      } else if (// this evidence clashes with the librarians evidence?
+      } else if (
+        // this evidence clashes with the librarians evidence?
         this.name === "Cassie" &&
         this.lastLine.includes("whole time")
       ) {
         game.addEvidence("Cassie hasn't moved.");
-      }else if (
+      } else if (
         this.name === "Librarian" &&
         this.lastLine.includes("near my desk")
       ) {
