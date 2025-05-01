@@ -100,10 +100,11 @@ function setup() {
   startButton = createButton("start game");
   startButton.position(width / 2 - 50, height / 2);
   startButton.mousePressed(() => {
-    gameState = "game";
+    gameState = "dialogue";
     startButton.hide();
     controlsButton.hide();
     if (backButton) backButton.hide();
+    game.player.canMove = true;
   });
 
   //controls like deleuze
@@ -130,27 +131,23 @@ function setup() {
 
 //DRAW FUNCTION
 function draw() {
-  
+  background(220); // Clear each frame
 
-if (gameState === "title"){
-  drawTitleScreen();
-} else if (gameState === "controls"){
-  drawControlsScreen();
- } else if (gameState === "game"){
-  drawGame();
-  background(220);
-  game.update();
-  game.display();
- }else if (gameState === "dialogue"){
-    drawDialogue();
-    drawGame();
-  background(220);
-  game.update();
-  game.display();
+  if (gameState === "title") {
+    drawTitleScreen();
+  } else if (gameState === "controls") {
+    drawControlsScreen();
+  } else if (gameState === "game"|| gameState === "dialogue") {
+    game.update();
+    game.display();
+
+    if (gameState === "dialogue") {
+      game.display();
+      drawDialogue();
+    }
   }
- 
- }
- function drawTitleScreen() {
+}
+function drawTitleScreen() {
   textAlign(CENTER);
   textSize(40);
   fill(50);
@@ -163,7 +160,11 @@ function drawControlsScreen() {
   fill(0);
   text("controls:", 40, 80);
   text("WASD to move", 40, 110);
-  text("-Use Spacebar to navigate cutscene, Press 1 repeatedly to Talk, 2 repeatedly to Ask for Alibi, 3 repeatedly to Accuse", 40, 140);
+  text(
+    "-Use Spacebar to navigate cutscene, Press 1 repeatedly to Talk, 2 repeatedly to Ask for Alibi, 3 repeatedly to Accuse",
+    40,
+    140
+  );
   text("- Use mouse for UI buttons", 40, 170);
 }
 
@@ -187,16 +188,15 @@ function keyPressed() {
   // if NPC is active and keypressed is 1,2, or 3, dialogue optns
   if (gameState === "dialogue" && key === " ") {
     currentLine++;
-
     if (currentLine >= dialogue.length) {
-      gameState = "play";
+      gameState = "game";
       game.player.canMove = true; // Unlock player movement
     }
     return;
   }
 
   // only handling game inputs when game is in "play"
-  if (gameState === "play") {
+  if (gameState === "game") {
     // NPC interaction
     if (game.activeNPC && ["1", "2", "3"].includes(key)) {
       game.activeNPC.handleDialogue(key, game);
@@ -226,12 +226,14 @@ class Game {
     this.rooms = {};
     this.currentRoom = "mainRoom";
     this.player = new Player(3, 5);
+    this.player.canMove = true;
     this.inventory = [];
     this.ui = new UI(this);
     this.activeNPC = null;
     this.allBooks = [];
     this.allEvidence = [];
     this.collectedEvidence = [];
+    this.startCutsceneDone = false;
   }
 
   setup() {
@@ -243,8 +245,6 @@ class Game {
           "Amalia",
           200,
           170,
-
-          140,
           {
             talk: [
               "Teacher: Amalia, some of the books have gone missing, may I know where you have been?",
@@ -368,7 +368,7 @@ class Game {
           350,
 
           340,
-          [
+          
             {
               talk: [
                 "Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
@@ -383,11 +383,11 @@ class Game {
                 // add fallen book to evidence list
               ],
 
-              alibi: [],
-              accuseGuilty: [],
-              accuseInnocent: [],
+              alibi: ["No alibi"],
+              accuseGuilty: ["Can't accuse Josh"],
+              accuseInnocent: ["Can't accuse Josh"],
             },
-          ],
+        
 
           joshNpc
         ),
@@ -588,7 +588,7 @@ class Player {
   constructor(x, y) {
     this.grid = createVector(x, y);
     this.sprite = teacherNpc;
-    this.canMove = false; // player starts locked
+    this.canMove = true; // player starts locked
   }
 
   display() {
@@ -658,12 +658,11 @@ class NPC {
 
   display() {
     imageMode(CENTER);
-    if (this.img) {
+    
+    if (this.img && this.img.width) {
       image(this.img, this.pos.x, this.pos.y, 40, 60);
-    } else {
-      fill(255, 200, 200);
-      ellipse(this.pos.x, this.pos.y, 40, 60);
     }
+  
 
     // name over the sprites head
     fill(0);
