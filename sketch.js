@@ -182,6 +182,9 @@ class Game {
         new NPC(
           "Amalia",
           200,
+          170,
+          
+            
           140,
           {
             talk: [
@@ -197,6 +200,7 @@ class Game {
             accuseGuilty: ["You cannot accuse Amalia"],
             accuseInnocent: ["You cannot accuse Amalia"],
           },
+
 
           amaliaNpc
         ),
@@ -303,6 +307,9 @@ class Game {
         new NPC(
           "Josh",
           350,
+          350,
+         
+    
           340,
           [
             {
@@ -324,6 +331,7 @@ class Game {
               accuseInnocent: [],
             },
           ],
+
           joshNpc
         ),
 
