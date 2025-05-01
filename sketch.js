@@ -88,8 +88,8 @@ function preload() {
 
 //SET UP
 function setup() {
-  createCanvas(700, 500);
-
+  cnv = createCanvas(700, 500);
+  cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
   gameFont = "monospace";
   textFont(gameFont);
   game = new Game();
@@ -135,7 +135,7 @@ function keyPressed() {
     return;
   }
 
-  // only handlign game inputs when game is in "play"
+  // only handling game inputs when game is in "play"
   if (gameState === "play") {
     // NPC interaction
     if (game.activeNPC && ["1", "2", "3"].includes(key)) {
@@ -215,11 +215,22 @@ class Game {
               "Librarian: …………",
               "Librarian: I’ll just put this back when I’m done reading.",
             ],
-            alibi: ["alibi"],
-            accuseGuilty: ["accuse guilty"],
-            accuseInnocent: ["accuse innocent"],
+            alibi: [
+             "Teacher: Ma’am?",
+             "Librarian: *Grumpily* What is it now?",
+             "Teacher: Can I ask you a few questions abput what you saw happen?",
+             "",
+             " Librarian: YOU CALLIN’ ME A LIAR?!?!",
+             "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
+            "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
+            "BUT I KNOW I saw with my two own eyes from across the library!",
+          "Teacher: So, the culprit wasn’t anywhere near you?",
+          "Librarian: Yes, the only time anyone came near my desk was near the beginning of this class trip when that girl sitting at that table checked out that book she’s still currently reading.",
+    // ADD EVIDENCE
+              ],
+            accuseGuilty: ["You can't accuse Librarian."],
+            accuseInnocent: ["You can't accuse Librarian."],
           },
-
           libNpc
         ),
 
@@ -270,7 +281,8 @@ class Game {
               "Teacher: SHUT UP! BOTH OF YOU",
             ],
           },
-          derekNpc
+          derekNpc,
+          true // derek is guiLTY
         ),
       ],
       [
@@ -412,8 +424,8 @@ class Game {
         new Book(
           "Glasses Jones and the Elusive Emerald",
           yellowBookImg,
-          5 * tileSize + tileSize / 2 + 10,
-          3 * tileSize + tileSize / 2 + 10,
+          5 * tileSize + tileSize / 2 + 60,
+          3 * tileSize + tileSize / 2 + 60,
           this
         ),
       ]
@@ -454,8 +466,8 @@ class Game {
     let tile = this.currentRoomObj().getTile(this.player.grid);
     if (tile === 3) {
       this.currentRoom =
-        this.currAentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
-      this.player.setPosition(3, 5);
+        this.currentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
+      this.player.setPosition(1, 1);
     }
   }
   // helper func to get current rm obj
@@ -654,11 +666,16 @@ class NPC {
         this.lastLine.includes("near the librarian’s desk")
       ) {
         game.addEvidence("Derek was near the librarian’s desk");
-      } else if (
+      } else if (// this evidence clashes with the librarians evidence?
         this.name === "Cassie" &&
         this.lastLine.includes("whole time")
       ) {
         game.addEvidence("Cassie hasn't moved.");
+      }else if (
+        this.name === "Librarian" &&
+        this.lastLine.includes("near my desk")
+      ) {
+        game.addEvidence("Nobody was near the Librarian's desk.");
       }
     } else {
       this.lastLine = "I have nothing more to say.";
@@ -713,7 +730,7 @@ class Tile {
     Tile.textures[3] = loadImage("Tiles/door-tile.png");
     Tile.textures[4] = loadImage("Tiles/front-desk1.png"); //top half of desk
     Tile.textures[5] = loadImage("Tiles/front-desk2.png"); //bottom half
-    Tile.textures[6]= loadImage("Tiles/toy-tile.png")
+    Tile.textures[6] = loadImage("Tiles/toy-tile.png");
   }
 
   static draw(index, x, y) {
