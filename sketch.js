@@ -39,6 +39,10 @@ let dialogue = [
   {
     speaker: "librarian",
     text: "Well, I noticed that some of the books are missing, and I noticed that one of your students pocketing one of them and darting away!",
+  }, 
+  {
+    speaker: "librarian",
+    text: "and I noticed that one of your students pocketing one of them and darting away!",
   },
   {
     speaker: "teacher",
@@ -46,7 +50,11 @@ let dialogue = [
   },
   {
     speaker: "librarian",
-    text: "Well, I couldn’t really see the child that well, but I know it was one of the books and the only children here currently are your students.",
+    text: "Well, I couldn’t really see the child that well, but I know it was one of the books",
+  },
+  {
+    speaker: "librarian",
+    text: "and the only children here currently are your students.",
   },
   {
     speaker: "librarian",
@@ -70,7 +78,11 @@ let dialogue = [
   },
   {
     speaker: "librarian",
-    text: "You better, check your book inventory, it's a list of the books that are missing. Talk to you students and add evidence to your list.",
+    text: "You better, check your book inventory, it's a list of the books that are missing.",
+  },
+  {
+    speaker: "librarian",
+    text: "Talk to your students and gather evidence.",
   },
 ];
 
@@ -99,7 +111,7 @@ function setup() {
 
   //start button
   startButton = createButton("start game");
-  startButton.position(width / 2 - 50, height / 2);
+  startButton.position(width / 2 - 80, height / 2+ 100);
   startButton.mousePressed(() => {
     gameState = "dialogue";
     startButton.hide();
@@ -111,14 +123,14 @@ function setup() {
   //controls like deleuze
 
   controlsButton = createButton("controls");
-  controlsButton.position(width / 2 - 50, height / 2 + 40);
+  controlsButton.position(width / 2 + 70, height / 2 + 100);
   controlsButton.mousePressed(() => {
     gameState = "controls";
     startButton.hide();
     controlsButton.hide();
     backButton.show();
   });
-
+//back button
   backButton = createButton("Back");
   backButton.position(20, 20);
   backButton.mousePressed(() => {
@@ -164,11 +176,13 @@ function drawControlsScreen() {
   text("controls:", 40, 80);
   text("WASD to move", 40, 110);
   text(
-    "-Use Spacebar to navigate cutscene, Press 1 repeatedly to Talk, 2 repeatedly to Ask for Alibi, 3 repeatedly to Accuse",
+    "-Use Spacebar to navigate cutscene",
     40,
     140
   );
-  text("- Use mouse for UI buttons", 40, 170);
+  text("Press 1 repeatedly to Talk, 2 repeatedly to Ask for Alibi", 40, 170);
+  text("3 repeatedly to Accuse", 40, 200);
+  text("- Use mouse for UI buttons", 40, 230);
 }
 
 function drawDialogue() {
@@ -198,7 +212,7 @@ function drawGameOverScreen() {
   // restart button
   if (!playAgainButton) {
     playAgainButton = createButton("Play Again");
-    playAgainButton.position(width/2 - 50, height/2 + 100);
+    playAgainButton.position(width/2 - 80, height/2 + 200);
     playAgainButton.mousePressed(resetGame);
   }
   playAgainButton.show();
@@ -389,8 +403,6 @@ class Game {
           "Josh",
           350,
           350,
-
-          340,
           
             {
               talk: [
@@ -504,16 +516,16 @@ class Game {
         new Book(
           "Starlight Explorers: Journey to the Cosmic Fair",
           blueBookImg,
-          5 * tileSize + tileSize / 2,
-          3 * tileSize + tileSize / 2,
+          5 * tileSize + tileSize / 2 + 310,
+          3 * tileSize + tileSize / 2 - 100,
           this
         ),
 
         new Book(
           "Glasses Jones and the Elusive Emerald",
           yellowBookImg,
-          5 * tileSize + tileSize / 2 + 60,
-          3 * tileSize + tileSize / 2 + 60,
+          5 * tileSize + tileSize / 2 + 80,
+          3 * tileSize + tileSize / 2 + 160,
           this
         ),
       ]
