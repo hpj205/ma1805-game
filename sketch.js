@@ -219,9 +219,21 @@ class Game {
               "Librarian: …………",
               "Librarian: I’ll just put this back when I’m done reading.",
             ],
-            alibi: ["alibi"],
-            accuseGuilty: ["accuse guilty"],
-            accuseInnocent: ["accuse innocent"],
+            alibi: [
+              "Teacher: Ma’am?",
+              "Librarian: *Grumpily* What is it now?",
+              "Teacher: Can I ask you a few questions abput what you saw happen?",
+              "Librarian: YOU CALLIN’ ME A LIAR?!?!",
+              "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
+              "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
+              "Librarian: BUT I KNOW I saw with my two own eyes from across the library!",
+              "Teacher: So, the culprit wasn’t anywhere near you?",
+              "Librarian: Yes. The only time somone was near my desk was when that girl reading by that table over there checked a book out.",
+              "(You notice that she's pointing over to Amalia.)",
+              "Teacher: Thank you."],
+              //ADDS EVIDENCE: No one was near the librarian's desk when the crime was commited 
+            accuseGuilty: ["You cannot accuse the Librarian"],
+            accuseInnocent: ["You cannot accuse the Librarian"],
           },
 
           libNpc
@@ -237,6 +249,7 @@ class Game {
               "Derek: Ah, are you trying to find out my motivation dear teacher? Well as you should know, as an amazing detective, I only read mystery novels and science books to hone my skills.",
               "Teacher: …... That sounds nice Derek.",
               "Teacher *Internally*: Man, this kid is weird",
+              //ADDS EVIDENCE: Derek likes mystery and science
             ],
             alibi: [
               "Teacher: Derek, can I ask you something?",
@@ -254,7 +267,8 @@ class Game {
             accuseGuilty: [
               "Teacher: Derek, I need you to empty out your pockets, I know you took the book",
               "Derek: WHAT?! But I’m the detective I can’t steal!",
-              "Teacher: Derek, please.",
+              "Teacher: Derek, please, you said that you were near by the Librarian’s desk,",
+              "but she said that no one was near her desk for nearly the whole class trip.",
               "(Derek silently pulls out the book)",
               "Teacher: *Sigh* Derek…",
               "Derek: I was going to give it back. I was going to use to help me find the other books",
@@ -262,17 +276,19 @@ class Game {
               "Derek: Ok, I’m sorry",
               "Teacher: It’s alright as long as you know",
             ],
-            accuseInnocent: [
-              "Teacher: Derek can you please empty out your pockets",
-              "Derek: What?! But I’m the detective! I couldn’t steal something!",
-              "Teacher: Derek, please.",
-              "(Derek’s pockets are empty)",
-              " Teacher:.....",
-              "Derek: I told you! You doubted my abilities as the greatest detective!",
-              "Librarian:......",
-              "Librarian: To be honest he’s right, I should have tasked him to find the books not you",
-              "Teacher: SHUT UP! BOTH OF YOU",
-            ],
+            // This Alows the game won screen to appear
+            
+            //accuseInnocent: [
+              //"Teacher: Derek can you please empty out your pockets",
+              //"Derek: What?! But I’m the detective! I couldn’t steal something!",
+              //"Teacher: Derek, please.",
+              //"(Derek’s pockets are empty)",
+              //" Teacher:.....",
+              //"Derek: I told you! You doubted my abilities as the greatest detective!",
+              //"Librarian:......",
+              //"Librarian: To be honest he’s right, I should have tasked him to find the books not you",
+              //"Teacher: SHUT UP! BOTH OF YOU",
+            //],
           },
           derekNpc
         ),
@@ -332,20 +348,25 @@ class Game {
               "Teacher: Cassie, can I know what kind of books you are interested in?",
               "Cassie: O-oh w-well, I want t-to learn how to become more confident and b-braver...",
               "Teacher: That sounds very nice.",
+              "Cassie: I want to check out this one book, but I’m to nervous to talk to the librarian to check it out.",
+              "(You notice the title of the book, The Tale of the Courageous MegaGirl, and that it’s one of the missing books.)",
+              "(You also note that since she’s too nervous to simply check out the book that she would she would in no doubt be too afraid to steal it)",
             ],
             alibi: [
               "Teacher: Cassie, can I know where you were in the past few minutes, one of the library’s books have gone missing.",
               "Cassie: O-oh, s-s-sorry ma’am, I’ve been here t-the whole time, lo-looking at the t-titles of the b-books",
               "Teacher: Thank you, Cassie.",
+              //ADDS EVIDENCE: Cassie has been near this shelf
             ],
-            accuseGuilty: [
-              "Teacher: Cassie can you please empty out your pockets",
-              "Cassie: B-b-but why?",
-              "Teacher: Cassie, please.",
-              "Cassie silently pulls out the book.",
-              "Teacher: I’m not mad, but you should know it isn’t right to steal...",
-              "Cassie: Okay.",
-            ],
+            
+            //accuseGuilty: [
+              //"Teacher: Cassie can you please empty out your pockets",
+              //"Cassie: B-b-but why?",
+              //"Teacher: Cassie, please.",
+              //"Cassie silently pulls out the book.",
+              //"Teacher: I’m not mad, but you should know it isn’t right to steal...",
+              //"Cassie: Okay.",
+            //],
             accuseInnocent: [
               "Teacher: Cassie can you please empty out your pockets",
               "Cassie: B-b-but why?",
@@ -367,7 +388,9 @@ class Game {
               "Teacher: Rosalyn, can I know what kind of books you are interested in?",
               "Rosalyn: Oh, well I’ve been super obsessed with those amazing period books in the Regency! I adore all the flowery talk everyone uses. It makes me want to learn how to make my own poetry that’s like that",
               "Teacher: That sounds very lovely Rosalyn.",
-            ],
+              "Rosalyn: I got really good ideas from this one book I read The Complete Language of Flowers. I put it up on the shelf behind me after reading it",
+              "(You note that an informational book on flower theory wouldn’t really fit in the kid’s section and that Rosalyn most likely put the book in the wrong place)",
+            ], //ADDS EVIDENCE: One of the missing books was just put in the wrong place
 
             alibi: [
               "Teacher: Rosalyn, can I ask you something?",
@@ -378,14 +401,14 @@ class Game {
 
               //ADDS EVIDENCE: ROSYALN WAS IN THE KIDS SECTION W/ STUFFIES
             ],
-            accuseGuilty: [
-              "Teacher: Rosalyn can you please empty out your pockets",
-              "Rosalyn: HUH!? But why!",
-              "Teacher: Rosalyn, please.",
-              "(Rosalyn silently pulls out the book)",
-              "Teacher: I’m not mad, but you should know it isn’t right to steal. Let’s go get this book checked out together, ok?",
-              "Rosalyn: *Sigh* Alright. I’m very sorry",
-            ],
+            //accuseGuilty: [
+              //"Teacher: Rosalyn can you please empty out your pockets",
+              //"Rosalyn: HUH!? But why!",
+              //"Teacher: Rosalyn, please.",
+              //"(Rosalyn silently pulls out the book)",
+              //"Teacher: I’m not mad, but you should know it isn’t right to steal. Let’s go get this book checked out together, ok?",
+              //"Rosalyn: *Sigh* Alright. I’m very sorry",
+            //],
             accuseInnocent: [
               "Teacher: Rosalyn can you please empty out your pockets",
               "Rosalyn: Huh? Why? I didn’t steal anything!",
