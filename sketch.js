@@ -300,8 +300,8 @@ class Game {
       [
         new NPC(
           "Amalia",
-          200,
-          170,
+          240,
+          150,
           {
             talk: [
               "Teacher: Amalia, some of the books have gone missing, may I know where you have been?",
@@ -533,8 +533,8 @@ class Game {
         new Book(
           "Glasses Jones and the Elusive Emerald",
           yellowBookImg,
-          5 * tileSize + tileSize / 2 + 80,
-          3 * tileSize + tileSize / 2 + 160,
+          5 * tileSize + tileSize / 2 + 180,
+          3 * tileSize + tileSize / 2 + 230,
           this
         ),
       ]
