@@ -21,8 +21,8 @@ let amaliaNpc, cassieNpc, derekNpc, joshNpc, libNpc, rosalynNpc, teacherNpc;
 let currentNPC = null;
 let dialogueType = "";
 let dialogueIndex = 0;
-let playAgainButton;
-let startButton, controlsButton, backButton;
+
+let startButton, controlsButton, backButton, playAgainButton;
 let gameState = "title"; // game will start w title page
 let teacher, librarian;
 let otherNPCs = []; //hold students
@@ -98,6 +98,13 @@ function preload() {
   libNpc = loadImage("characters/Librarian.png");
   rosalynNpc = loadImage("characters/Rosalyn.png");
   teacherNpc = loadImage("characters/Teacher.png");
+
+
+  // buttons
+  startButton = loadImage("buttons/Start Game Button 1.png");
+  playAgainButton = loadImage ("buttons/Play Again Button 1.png");
+  inventoryButton = loadImage("buttons/Book List button.png");
+
 }
 
 //SET UP
@@ -110,7 +117,7 @@ function setup() {
   game.setup();
 
   //start button
-  startButton = createButton("start game");
+  startButton = createImg("buttons/Start Game Button 1.png");
   startButton.position(width / 2 - startButton.width / 2, height / 2 + 100);
   startButton.mousePressed(() => {
     gameState = "dialogue";
@@ -147,8 +154,8 @@ function setup() {
 
 //DRAW FUNCTION
 function draw() {
-  clear();
-
+  clear();// let me be clear
+// no color  behind the tiles
   if (gameState === "title") {
     drawTitleScreen();
   } else if (gameState === "controls") {
@@ -165,6 +172,7 @@ function draw() {
     }
   }
 }
+//title scrn function
 function drawTitleScreen() {
   background(220);
   textAlign(CENTER);
@@ -173,6 +181,7 @@ function drawTitleScreen() {
   text("Library Theft", width / 2, height / 3);
 }
 
+//controls scrn function
 function drawControlsScreen() {
   background(220);
   textAlign(LEFT);
@@ -186,6 +195,7 @@ function drawControlsScreen() {
   text("- Use mouse for UI buttons", 40, 230);
 }
 
+//draw dialogue box n text 
 function drawDialogue() {
   // dialogue box
   fill(255);
@@ -194,7 +204,7 @@ function drawDialogue() {
   // speaker name
   fill(0);
   textSize(20);
-  text(dialogue[currentLine].speaker + ":", 70, 430);
+  text(dialogue[currentLine].speaker + ":", 120, 430);
 
   // dialogue text
   textSize(16);
@@ -212,7 +222,7 @@ function drawGameOverScreen() {
 
   // restart button
   if (!playAgainButton) {
-    playAgainButton = createButton("Play Again");
+    playAgainButton = createImg("buttons/Play Again Button 1.png");
     playAgainButton.position(width / 2 - 80, height / 2 + 200);
     playAgainButton.mousePressed(resetGame);
   }
@@ -248,11 +258,11 @@ function keyPressed() {
     }
   }
   if (game.activeNPC && ["1", "2", "3"].includes(key)) {
-    game.activeNPC.handleDialogue(key, game); // npc dialoge base on key
+    game.activeNPC.handleDialogue(key, game); // npc dialogue base on key
     return; // early return, stop key handling
   }
 
-  game.handleInput(key); // otherwise handle playr input
+  game.handleInput(key); // otherwise handle player input
 }
 
 //reset game function
@@ -721,14 +731,14 @@ class NPC {
       fill(0);
       textSize(14);
       textFont("monospace");
-      text("1. Talk    2. Alibi    3. Accuse", 70, height - 110);
+      text("1. Talk    2. Alibi    3. Accuse", 200, height - 110);
 
       // display NPCS last line of dialogue
       if (this.lastLine) {
         textSize(16);
         fill(0);
         textWrap(WORD);
-        text(`${this.name}: "${this.lastLine}"`, 70, height - 80, width - 140);
+        text(`${this.name}: "${this.lastLine}"`, 100, height - 80, width - 140);
       }
     }
   }
@@ -751,7 +761,8 @@ class NPC {
     if (dialogueArray.length > 0) {
       this.lastLine = dialogueArray.shift();
 
-      // ah yes, a string of messy if-statements :)
+      // ah yes, many many if-statements :)
+      // because how else would i have organize any of this :))
 
       if (
         this.name === "Amalia" &&
@@ -863,15 +874,15 @@ class UI {
   }
 
   createInventoryButton() {
-    this.inventoryButton = createButton("Books to find");
+    this.inventoryButton = createImg("buttons/Book List button.png");
     this.inventoryButton.position(300, 50);
     this.inventoryButton.mousePressed(() => this.toggleInventory());
   }
 
   //EVIDENCE BUTTON
   createEvidenceButton() {
-    this.evidenceButton = createButton("Evidence");
-    this.evidenceButton.position(500, 50);
+    this.evidenceButton = createImg("buttons/Evidence Button.png");
+    this.evidenceButton.position(500, 60);
     this.evidenceButton.mousePressed(() => this.toggleEvidence());
   }
 
@@ -894,12 +905,12 @@ class UI {
       rect(50, 50, 460, 150, 10);
       fill(0);
       textSize(16);
-      text("Inventory:", 70, 80);
+      text("Inventory:", 100, 80);
 
       this.game.allBooks.forEach((book, i) => {
         const yPos = 100 + i * 20;
         fill(book.collected ? 169 : 0); // grey if collected
-        text("- " + book.name, 70, yPos);
+        text("- " + book.name, 250, yPos);
       });
 
       if (this.showEvidence) {
@@ -907,13 +918,13 @@ class UI {
         rect(400, 50, 300, 150, 10);
         fill(0);
         textSize(16);
-        text("Evidence Bank:", 420, 80);
+        text("Evidence Bank:", 520, 80);
 
         // display collected evidence
         this.game.collectedEvidence.forEach((evidence, i) => {
           const yPos = 100 + i * 20;
           fill(0);
-          text("- " + evidence, 420, yPos);
+          text("- " + evidence, 500, yPos);
         });
       }
     }
@@ -972,7 +983,7 @@ class Evidence {
     const idx = parseInt(key) - 1;
 
     if (idx >= 0 && idx < this.dialogues.length) {
-      // show dialoge n evidence
+      // show dialogue n evidence
       this.lastLine = this.dialogues[idx];
       this.collect(game);
 
