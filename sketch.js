@@ -1,7 +1,8 @@
 /* == programmer notes ==
 
-problems that need fixing:
-doesn't load properly, 
+- canvas positioning is funny
+- button positioning is funny
+- collisions r not collisioning 
 
 */
 
@@ -22,7 +23,6 @@ let dialogueType = "";
 let dialogueIndex = 0;
 let playAgainButton;
 let startButton, controlsButton, backButton;
-
 let gameState = "title"; // game will start w title page
 let teacher, librarian;
 let otherNPCs = []; //hold students
@@ -39,7 +39,7 @@ let dialogue = [
   {
     speaker: "librarian",
     text: "Well, I noticed that some of the books are missing, and I noticed that one of your students pocketing one of them and darting away!",
-  }, 
+  },
   {
     speaker: "librarian",
     text: "and I noticed that one of your students pocketing one of them and darting away!",
@@ -111,7 +111,7 @@ function setup() {
 
   //start button
   startButton = createButton("start game");
-  startButton.position(width / 2 - 80, height / 2+ 100);
+  startButton.position(width / 2 - startButton.width / 2, height / 2 + 100);
   startButton.mousePressed(() => {
     gameState = "dialogue";
     startButton.hide();
@@ -123,14 +123,14 @@ function setup() {
   //controls like deleuze
 
   controlsButton = createButton("controls");
-  controlsButton.position(width / 2 + 70, height / 2 + 100);
+  controlsButton.position(width / 2 - controlsButton.width / 2 + 100, height / 2 + 100);
   controlsButton.mousePressed(() => {
     gameState = "controls";
     startButton.hide();
     controlsButton.hide();
     backButton.show();
   });
-//back button
+  //back button
   backButton = createButton("Back");
   backButton.position(20, 20);
   backButton.mousePressed(() => {
@@ -150,15 +150,15 @@ function draw() {
     drawTitleScreen();
   } else if (gameState === "controls") {
     drawControlsScreen();
-  }else if (gameState === "gameover"){
+  } else if (gameState === "gameover") {
     drawGameOverScreen();
-  } else if (gameState === "game"|| gameState === "dialogue") {
+  } else if (gameState === "game" || gameState === "dialogue") {
     game.update();
     game.display();
 
     if (gameState === "dialogue") {
       game.display();
-     if (gameState === "dialogue") drawDialogue();
+      if (gameState === "dialogue") drawDialogue();
     }
   }
 }
@@ -175,11 +175,7 @@ function drawControlsScreen() {
   fill(0);
   text("controls:", 40, 80);
   text("WASD to move", 40, 110);
-  text(
-    "-Use Spacebar to navigate cutscene",
-    40,
-    140
-  );
+  text("-Use Spacebar to navigate cutscene", 40, 140);
   text("Press 1 repeatedly to Talk, 2 repeatedly to Ask for Alibi", 40, 170);
   text("3 repeatedly to Accuse", 40, 200);
   text("- Use mouse for UI buttons", 40, 230);
@@ -205,14 +201,14 @@ function drawGameOverScreen() {
   fill(255);
   textSize(40);
   textAlign(CENTER);
-  text("CASE SOLVED!", width/2, height/2);
+  text("CASE SOLVED!", width / 2, height / 2);
   textSize(20);
-  text("Derek was stealing books", width/2, height/2 + 50);
-  
+  text("Derek was stealing books", width / 2, height / 2 + 50);
+
   // restart button
   if (!playAgainButton) {
     playAgainButton = createButton("Play Again");
-    playAgainButton.position(width/2 - 80, height/2 + 200);
+    playAgainButton.position(width / 2 - 80, height / 2 + 200);
     playAgainButton.mousePressed(resetGame);
   }
   playAgainButton.show();
@@ -378,7 +374,6 @@ class Game {
               "Teacher: It’s alright as long as you know",
               "GAME OVER",
             ],
-            
           },
           derekNpc,
           true // derek is guiLTY
@@ -403,26 +398,25 @@ class Game {
           "Josh",
           350,
           350,
-          
-            {
-              talk: [
-                "Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
-                "Josh:.....",
-                "Teacher:.....",
-                "Josh: Did you seriously forget I’m blind?",
-                "Teacher:………………Yes",
-                "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
-                "Teacher: Thank you, did you remember which bookshelf?",
-                "Josh:……",
-                " Teacher: Oh, right. Sorry.",
-                // add fallen book to evidence list
-              ],
 
-              alibi: ["No alibi"],
-              accuseGuilty: ["Can't accuse Josh"],
-              accuseInnocent: ["Can't accuse Josh"],
-            },
-        
+          {
+            talk: [
+              "Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
+              "Josh:.....",
+              "Teacher:.....",
+              "Josh: Did you seriously forget I’m blind?",
+              "Teacher:………………Yes",
+              "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
+              "Teacher: Thank you, did you remember which bookshelf?",
+              "Josh:……",
+              " Teacher: Oh, right. Sorry.",
+              // add fallen book to evidence list
+            ],
+
+            alibi: ["No alibi"],
+            accuseGuilty: ["Can't accuse Josh"],
+            accuseInnocent: ["Can't accuse Josh"],
+          },
 
           joshNpc
         ),
@@ -605,7 +599,13 @@ class Room {
     for (let y = 0; y < tilesY; y++) {
       for (let x = 0; x < tilesX; x++) {
         let tileIndex = this.map[y][x];
-        Tile.draw(tileIndex, x, y);
+        image(
+          Tile.textures[tileIndex],
+          x * tileSize,
+          y * tileSize,
+          tileSize,
+          tileSize
+        );
       }
     }
     // display all npcs n books
@@ -656,10 +656,12 @@ class Player {
     let tile = room.map[newY][newX];
 
     // move the player as long as the tile is like walkable on
-    if (tile !== 1 && tile !== 2) {
-      this.grid.set(newX, newY);
-    }
-  }
+    if (newX !== this.grid.x || newY !== this.grid.y) {
+      let tile = room.map[newY][newX];
+      if (tile !== 1 && tile !== 2 && tile !== 4 && tile !== 5 ) { // 1s
+        this.grid.set(newX, newY);
+      }
+  }}
   // player pos as a vector to display rzns
   getPos() {
     return createVector(
@@ -688,16 +690,15 @@ class NPC {
   checkProximity(player) {
     // check if player is within certain distance from the npc
     this.active =
-      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 60;
+      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 80;
   }
 
   display() {
     imageMode(CENTER);
-    
+
     if (this.img && this.img.width) {
       image(this.img, this.pos.x, this.pos.y, 40, 60);
     }
-  
 
     // name over the sprites head
     fill(0);
@@ -781,10 +782,10 @@ class NPC {
       this.lastLine = "I have nothing more to say.";
     }
     //game over
-if (this.lastLine.includes("GAME OVER")) {
-  gameOver = true;
-  gameState = "gameover";
-}
+    if (this.lastLine.includes("GAME OVER")) {
+      gameOver = true;
+      gameState = "gameover";
+    }
   }
 }
 
@@ -801,7 +802,7 @@ class Book {
   checkPickup(player, inventory) {
     if (
       !this.collected &&
-      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 30
+      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 40
     ) {
       inventory.push(this.name);
       this.collected = true;
