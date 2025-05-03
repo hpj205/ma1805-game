@@ -123,7 +123,10 @@ function setup() {
   //controls like deleuze
 
   controlsButton = createButton("controls");
-  controlsButton.position(width / 2 - controlsButton.width / 2 + 100, height / 2 + 100);
+  controlsButton.position(
+    width / 2 - controlsButton.width / 2 + 100,
+    height / 2 + 100
+  );
   controlsButton.mousePressed(() => {
     gameState = "controls";
     startButton.hide();
@@ -144,7 +147,7 @@ function setup() {
 
 //DRAW FUNCTION
 function draw() {
-  background(220); // Clear each frame
+  clear();
 
   if (gameState === "title") {
     drawTitleScreen();
@@ -163,6 +166,7 @@ function draw() {
   }
 }
 function drawTitleScreen() {
+  background(220);
   textAlign(CENTER);
   textSize(40);
   fill(50);
@@ -170,6 +174,7 @@ function drawTitleScreen() {
 }
 
 function drawControlsScreen() {
+  background(220);
   textAlign(LEFT);
   textSize(20);
   fill(0);
@@ -658,10 +663,12 @@ class Player {
     // move the player as long as the tile is like walkable on
     if (newX !== this.grid.x || newY !== this.grid.y) {
       let tile = room.map[newY][newX];
-      if (tile !== 1 && tile !== 2 && tile !== 4 && tile !== 5 ) { // 1s
+      if (tile !== 1 && tile !== 2 && tile !== 4 && tile !== 5) {
+        // 1s
         this.grid.set(newX, newY);
       }
-  }}
+    }
+  }
   // player pos as a vector to display rzns
   getPos() {
     return createVector(
