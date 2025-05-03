@@ -99,17 +99,15 @@ function preload() {
   rosalynNpc = loadImage("characters/Rosalyn.png");
   teacherNpc = loadImage("characters/Teacher.png");
 
-
   // buttons
   startButton = loadImage("buttons/Start Game Button 1.png");
-  playAgainButton = loadImage ("buttons/Play Again Button 1.png");
+  playAgainButton = loadImage("buttons/Play Again Button 1.png");
   inventoryButton = loadImage("buttons/Book List button.png");
-
 }
 
 //SET UP
 function setup() {
-  cnv = createCanvas(700, 500);
+  cnv = createCanvas(tilesX * tileSize, tilesY * tileSize);
   cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
   gameFont = "monospace";
   textFont(gameFont);
@@ -118,7 +116,7 @@ function setup() {
 
   //start button
   startButton = createImg("buttons/Start Game Button 1.png");
-  startButton.position(width / 2 - startButton.width / 2, height / 2 + 100);
+  startButton.position(800, 400);
   startButton.mousePressed(() => {
     gameState = "dialogue";
     startButton.hide();
@@ -130,10 +128,7 @@ function setup() {
   //controls like deleuze
 
   controlsButton = createButton("controls");
-  controlsButton.position(
-    width / 2 - controlsButton.width / 2 + 100,
-    height / 2 + 100
-  );
+  controlsButton.position(900, 400);
   controlsButton.mousePressed(() => {
     gameState = "controls";
     startButton.hide();
@@ -154,9 +149,11 @@ function setup() {
 
 //DRAW FUNCTION
 function draw() {
-  clear();// let me be clear
-// no color  behind the tiles
-  if (gameState === "title") {
+  clear(); // let me be clear
+  // no color  behind the tiles
+  for (let y = 0; y < tilesY; y++) {
+    for (let x = 0; x < tilesX; x++) {
+   if (gameState === "title") {
     drawTitleScreen();
   } else if (gameState === "controls") {
     drawControlsScreen();
@@ -169,9 +166,9 @@ function draw() {
     if (gameState === "dialogue") {
       game.display();
       if (gameState === "dialogue") drawDialogue();
-    }
+    }}
   }
-}
+}}
 //title scrn function
 function drawTitleScreen() {
   background(220);
@@ -195,7 +192,7 @@ function drawControlsScreen() {
   text("- Use mouse for UI buttons", 40, 230);
 }
 
-//draw dialogue box n text 
+//draw dialogue box n text
 function drawDialogue() {
   // dialogue box
   fill(255);
@@ -223,7 +220,7 @@ function drawGameOverScreen() {
   // restart button
   if (!playAgainButton) {
     playAgainButton = createImg("buttons/Play Again Button 1.png");
-    playAgainButton.position(width / 2 - 80, height / 2 + 200);
+    playAgainButton.position(300, 300);
     playAgainButton.mousePressed(resetGame);
   }
   playAgainButton.show();
@@ -875,14 +872,14 @@ class UI {
 
   createInventoryButton() {
     this.inventoryButton = createImg("buttons/Book List button.png");
-    this.inventoryButton.position(300, 50);
+    this.inventoryButton.position(650, 50);
     this.inventoryButton.mousePressed(() => this.toggleInventory());
   }
 
   //EVIDENCE BUTTON
   createEvidenceButton() {
     this.evidenceButton = createImg("buttons/Evidence Button.png");
-    this.evidenceButton.position(500, 60);
+    this.evidenceButton.position(850, 60);
     this.evidenceButton.mousePressed(() => this.toggleEvidence());
   }
 
@@ -936,7 +933,7 @@ class UI {
       fill(0);
       textSize(14);
       textFont("monospace");
-      text(this.message, 70, height - 30);
+      text(this.message, 270, height - 30);
     }
   }
 }
