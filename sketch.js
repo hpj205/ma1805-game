@@ -1,7 +1,8 @@
 /* == programmer notes ==
 
-problems that need fixing:
-doesn't load properly, 
+- canvas positioning is funny
+- button positioning is funny
+- collisions r not collisioning 
 
 */
 
@@ -11,6 +12,7 @@ let tilesX = 14;
 let tilesY = 10;
 
 let game; // game obj
+let gameOver = false;
 
 let redBookImg, greenBookImg, blueBookImg, yellowBookImg, purpleBookImg;
 // "why'd you call them nameNPC instead of just name?"
@@ -20,8 +22,8 @@ let currentNPC = null;
 let dialogueType = "";
 let dialogueIndex = 0;
 let playAgainButton;
-
-let gameState = "dialogue"; // game will start w teacher-librarian dialogue
+let startButton, controlsButton, backButton;
+let gameState = "title"; // game will start w title page
 let teacher, librarian;
 let otherNPCs = []; //hold students
 let currentLine = 0;
@@ -39,12 +41,20 @@ let dialogue = [
     text: "Well, I noticed that some of the books are missing, and I noticed that one of your students pocketing one of them and darting away!",
   },
   {
+    speaker: "librarian",
+    text: "and I noticed that one of your students pocketing one of them and darting away!",
+  },
+  {
     speaker: "teacher",
     text: "Can you tell me which student it was so I can get it back?",
   },
   {
     speaker: "librarian",
-    text: "Well, I couldn’t really see the child that well, but I know it was one of the books and the only children here currently are your students.",
+    text: "Well, I couldn’t really see the child that well, but I know it was one of the books",
+  },
+  {
+    speaker: "librarian",
+    text: "and the only children here currently are your students.",
   },
   {
     speaker: "librarian",
@@ -68,7 +78,11 @@ let dialogue = [
   },
   {
     speaker: "librarian",
-    text: "You better, check your book inventory, it's a list of the books that are missing. Talk to you students and add evidence to your list.",
+    text: "You better, check your book inventory, it's a list of the books that are missing.",
+  },
+  {
+    speaker: "librarian",
+    text: "Talk to your students and gather evidence.",
   },
 ];
 
@@ -88,23 +102,83 @@ function preload() {
 
 //SET UP
 function setup() {
-  createCanvas(700, 500);
-
+  cnv = createCanvas(700, 500);
+  cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
   gameFont = "monospace";
   textFont(gameFont);
   game = new Game();
   game.setup();
+
+  //start button
+  startButton = createButton("start game");
+  startButton.position(width / 2 - startButton.width / 2, height / 2 + 100);
+  startButton.mousePressed(() => {
+    gameState = "dialogue";
+    startButton.hide();
+    controlsButton.hide();
+    if (backButton) backButton.hide();
+    game.player.canMove = true;
+  });
+
+  //controls like deleuze
+
+  controlsButton = createButton("controls");
+  controlsButton.position(width / 2 - controlsButton.width / 2 + 100, height / 2 + 100);
+  controlsButton.mousePressed(() => {
+    gameState = "controls";
+    startButton.hide();
+    controlsButton.hide();
+    backButton.show();
+  });
+  //back button
+  backButton = createButton("Back");
+  backButton.position(20, 20);
+  backButton.mousePressed(() => {
+    gameState = "title";
+    startButton.show();
+    controlsButton.show();
+    backButton.hide();
+  });
+  backButton.hide();
 }
 
 //DRAW FUNCTION
 function draw() {
-  background(220);
-  game.update();
-  game.display();
+  background(220); // Clear each frame
 
-  if (gameState === "dialogue") {
-    drawDialogue();
+  if (gameState === "title") {
+    drawTitleScreen();
+  } else if (gameState === "controls") {
+    drawControlsScreen();
+  } else if (gameState === "gameover") {
+    drawGameOverScreen();
+  } else if (gameState === "game" || gameState === "dialogue") {
+    game.update();
+    game.display();
+
+    if (gameState === "dialogue") {
+      game.display();
+      if (gameState === "dialogue") drawDialogue();
+    }
   }
+}
+function drawTitleScreen() {
+  textAlign(CENTER);
+  textSize(40);
+  fill(50);
+  text("Library Theft", width / 2, height / 3);
+}
+
+function drawControlsScreen() {
+  textAlign(LEFT);
+  textSize(20);
+  fill(0);
+  text("controls:", 40, 80);
+  text("WASD to move", 40, 110);
+  text("-Use Spacebar to navigate cutscene", 40, 140);
+  text("Press 1 repeatedly to Talk, 2 repeatedly to Ask for Alibi", 40, 170);
+  text("3 repeatedly to Accuse", 40, 200);
+  text("- Use mouse for UI buttons", 40, 230);
 }
 
 function drawDialogue() {
@@ -121,22 +195,39 @@ function drawDialogue() {
   textSize(16);
   text(dialogue[currentLine].text, 70, 460, width - 140);
 }
+//game over
+function drawGameOverScreen() {
+  background(0);
+  fill(255);
+  textSize(40);
+  textAlign(CENTER);
+  text("CASE SOLVED!", width / 2, height / 2);
+  textSize(20);
+  text("Derek was stealing books", width / 2, height / 2 + 50);
+
+  // restart button
+  if (!playAgainButton) {
+    playAgainButton = createButton("Play Again");
+    playAgainButton.position(width / 2 - 80, height / 2 + 200);
+    playAgainButton.mousePressed(resetGame);
+  }
+  playAgainButton.show();
+}
 
 //KEYPRESSED FUNCTION
 function keyPressed() {
   // if NPC is active and keypressed is 1,2, or 3, dialogue optns
   if (gameState === "dialogue" && key === " ") {
     currentLine++;
-
     if (currentLine >= dialogue.length) {
-      gameState = "play";
+      gameState = "game";
       game.player.canMove = true; // Unlock player movement
     }
     return;
   }
 
-  // only handlign game inputs when game is in "play"
-  if (gameState === "play") {
+  // only handling game inputs when game is in "play"
+  if (gameState === "game") {
     // NPC interaction
     if (game.activeNPC && ["1", "2", "3"].includes(key)) {
       game.activeNPC.handleDialogue(key, game);
@@ -159,6 +250,17 @@ function keyPressed() {
   game.handleInput(key); // otherwise handle playr input
 }
 
+//reset game function
+function resetGame() {
+  gameOver = false;
+  game = new Game();
+  game.setup();
+  gameState = "title";
+  if (playAgainButton) playAgainButton.hide();
+  startButton.show();
+  controlsButton.show();
+}
+
 // GAME CLASS
 // manages rooms, player, inventory, NPC interactions
 class Game {
@@ -166,12 +268,14 @@ class Game {
     this.rooms = {};
     this.currentRoom = "mainRoom";
     this.player = new Player(3, 5);
+    this.player.canMove = true;
     this.inventory = [];
     this.ui = new UI(this);
     this.activeNPC = null;
     this.allBooks = [];
     this.allEvidence = [];
     this.collectedEvidence = [];
+    this.startCutsceneDone = false;
   }
 
   setup() {
@@ -183,9 +287,6 @@ class Game {
           "Amalia",
           200,
           170,
-          
-            
-          140,
           {
             talk: [
               "Teacher: Amalia, some of the books have gone missing, may I know where you have been?",
@@ -200,7 +301,6 @@ class Game {
             accuseGuilty: ["You cannot accuse Amalia"],
             accuseInnocent: ["You cannot accuse Amalia"],
           },
-
 
           amaliaNpc
         ),
@@ -223,6 +323,7 @@ class Game {
               "Teacher: Ma’am?",
               "Librarian: *Grumpily* What is it now?",
               "Teacher: Can I ask you a few questions abput what you saw happen?",
+<<<<<<< HEAD
               "Librarian: YOU CALLIN’ ME A LIAR?!?!",
               "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
               "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
@@ -234,8 +335,20 @@ class Game {
               //ADDS EVIDENCE: No one was near the librarian's desk when the crime was commited 
             accuseGuilty: ["You cannot accuse the Librarian"],
             accuseInnocent: ["You cannot accuse the Librarian"],
+=======
+              "",
+              " Librarian: YOU CALLIN’ ME A LIAR?!?!",
+              "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
+              "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
+              "BUT I KNOW I saw with my two own eyes from across the library!",
+              "Teacher: So, the culprit wasn’t anywhere near you?",
+              "Librarian: Yes, the only time anyone came near my desk was near the beginning of this class trip when that girl sitting at that table checked out that book she’s still currently reading.",
+              // ADD EVIDENCE
+            ],
+            accuseGuilty: ["You can't accuse Librarian."],
+            accuseInnocent: ["You can't accuse Librarian."],
+>>>>>>> 30ee57d626101564d9d8e4476e19231b3f6cf408
           },
-
           libNpc
         ),
 
@@ -275,6 +388,7 @@ class Game {
               "Teacher: I know you wanted to help but doing something wrong won’t make it become right",
               "Derek: Ok, I’m sorry",
               "Teacher: It’s alright as long as you know",
+<<<<<<< HEAD
             ],
             // This Alows the game won screen to appear
             
@@ -289,8 +403,13 @@ class Game {
               //"Librarian: To be honest he’s right, I should have tasked him to find the books not you",
               //"Teacher: SHUT UP! BOTH OF YOU",
             //],
+=======
+              "GAME OVER",
+            ],
+>>>>>>> 30ee57d626101564d9d8e4476e19231b3f6cf408
           },
-          derekNpc
+          derekNpc,
+          true // derek is guiLTY
         ),
       ],
       [
@@ -312,29 +431,25 @@ class Game {
           "Josh",
           350,
           350,
-         
-    
-          340,
-          [
-            {
-              talk: [
-                "Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
-                "Josh:.....",
-                "Teacher:.....",
-                "Josh: Did you seriously forget I’m blind?",
-                "Teacher:………………Yes",
-                "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
-                "Teacher: Thank you, did you remember which bookshelf?",
-                "Josh:……",
-                " Teacher: Oh, right. Sorry.",
-                // add fallen book to evidence list
-              ],
 
-              alibi: [],
-              accuseGuilty: [],
-              accuseInnocent: [],
-            },
-          ],
+          {
+            talk: [
+              "Teacher: Josh some of the books went missing, may I ask if you have seen any of them?",
+              "Josh:.....",
+              "Teacher:.....",
+              "Josh: Did you seriously forget I’m blind?",
+              "Teacher:………………Yes",
+              "Josh: Well I didn’t SEE any books, but I have heard some stuff falling around the bookshelves, maybe one of the books fell behind them",
+              "Teacher: Thank you, did you remember which bookshelf?",
+              "Josh:……",
+              " Teacher: Oh, right. Sorry.",
+              // add fallen book to evidence list
+            ],
+
+            alibi: ["No alibi"],
+            accuseGuilty: ["Can't accuse Josh"],
+            accuseInnocent: ["Can't accuse Josh"],
+          },
 
           joshNpc
         ),
@@ -435,16 +550,16 @@ class Game {
         new Book(
           "Starlight Explorers: Journey to the Cosmic Fair",
           blueBookImg,
-          5 * tileSize + tileSize / 2,
-          3 * tileSize + tileSize / 2,
+          5 * tileSize + tileSize / 2 + 310,
+          3 * tileSize + tileSize / 2 - 100,
           this
         ),
 
         new Book(
           "Glasses Jones and the Elusive Emerald",
           yellowBookImg,
-          5 * tileSize + tileSize / 2 + 10,
-          3 * tileSize + tileSize / 2 + 10,
+          5 * tileSize + tileSize / 2 + 80,
+          3 * tileSize + tileSize / 2 + 160,
           this
         ),
       ]
@@ -485,8 +600,8 @@ class Game {
     let tile = this.currentRoomObj().getTile(this.player.grid);
     if (tile === 3) {
       this.currentRoom =
-        this.currAentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
-      this.player.setPosition(3, 5);
+        this.currentRoom === "mainRoom" ? "childrenLibrary" : "mainRoom";
+      this.player.setPosition(1, 1);
     }
   }
   // helper func to get current rm obj
@@ -524,7 +639,13 @@ class Room {
     for (let y = 0; y < tilesY; y++) {
       for (let x = 0; x < tilesX; x++) {
         let tileIndex = this.map[y][x];
-        Tile.draw(tileIndex, x, y);
+        image(
+          Tile.textures[tileIndex],
+          x * tileSize,
+          y * tileSize,
+          tileSize,
+          tileSize
+        );
       }
     }
     // display all npcs n books
@@ -542,7 +663,7 @@ class Player {
   constructor(x, y) {
     this.grid = createVector(x, y);
     this.sprite = teacherNpc;
-    this.canMove = false; // player starts locked
+    this.canMove = true; // player starts locked
   }
 
   display() {
@@ -575,10 +696,12 @@ class Player {
     let tile = room.map[newY][newX];
 
     // move the player as long as the tile is like walkable on
-    if (tile !== 1 && tile !== 2) {
-      this.grid.set(newX, newY);
-    }
-  }
+    if (newX !== this.grid.x || newY !== this.grid.y) {
+      let tile = room.map[newY][newX];
+      if (tile !== 1 && tile !== 2 && tile !== 4 && tile !== 5 ) { // 1s
+        this.grid.set(newX, newY);
+      }
+  }}
   // player pos as a vector to display rzns
   getPos() {
     return createVector(
@@ -607,16 +730,14 @@ class NPC {
   checkProximity(player) {
     // check if player is within certain distance from the npc
     this.active =
-      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 60;
+      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 80;
   }
 
   display() {
     imageMode(CENTER);
-    if (this.img) {
+
+    if (this.img && this.img.width) {
       image(this.img, this.pos.x, this.pos.y, 40, 60);
-    } else {
-      fill(255, 200, 200);
-      ellipse(this.pos.x, this.pos.y, 40, 60);
     }
 
     // name over the sprites head
@@ -686,13 +807,24 @@ class NPC {
       ) {
         game.addEvidence("Derek was near the librarian’s desk");
       } else if (
+        // this evidence clashes with the librarians evidence?
         this.name === "Cassie" &&
         this.lastLine.includes("whole time")
       ) {
         game.addEvidence("Cassie hasn't moved.");
+      } else if (
+        this.name === "Librarian" &&
+        this.lastLine.includes("near my desk")
+      ) {
+        game.addEvidence("Nobody was near the Librarian's desk.");
       }
     } else {
       this.lastLine = "I have nothing more to say.";
+    }
+    //game over
+    if (this.lastLine.includes("GAME OVER")) {
+      gameOver = true;
+      gameState = "gameover";
     }
   }
 }
@@ -710,7 +842,7 @@ class Book {
   checkPickup(player, inventory) {
     if (
       !this.collected &&
-      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 30
+      dist(this.pos.x, this.pos.y, player.getPos().x, player.getPos().y) < 40
     ) {
       inventory.push(this.name);
       this.collected = true;
@@ -744,7 +876,7 @@ class Tile {
     Tile.textures[3] = loadImage("Tiles/door-tile.png");
     Tile.textures[4] = loadImage("Tiles/front-desk1.png"); //top half of desk
     Tile.textures[5] = loadImage("Tiles/front-desk2.png"); //bottom half
-    Tile.textures[6]= loadImage("Tiles/toy-tile.png")
+    Tile.textures[6] = loadImage("Tiles/toy-tile.png");
   }
 
   static draw(index, x, y) {
