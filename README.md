@@ -8,6 +8,12 @@ OVERVIEW OF GAME
 Think of this like an introduction to your game. What is your game about? What are its key mechanics? What are its main narrative
 ideas and themes? What aesthetic choics did you make. 
 
+Yvette: It's a short mystery game where you play as a substitute teacher trying to solve the case of a missing library book. It takes place in two rooms, the main library and the children's library. The player  has to explore, speak to NPCs and make deductions based on the evidence gathered.
+
+Key mechanics are tile based movement, collision detection, NPC interaction thru key press (1,2,3 for talk, alibi, accuse), and a simple inventory/evidence system, and game states. 
+Narratively its based around observation, honesty and trust. 
+Visually, it uses hand-drawn pixel art inspired by old RPGMaker games :)
+
 INDIVIDUAL CONTRIBUTIONS
 
 Yvette: 
@@ -19,6 +25,8 @@ Artistically, I practised creating pixel art and I also learned how much visual 
 
 THEMES
 A sentence or two describing the major themes, tone, and ideas of your game.
+
+Yvette: The game explores ideas of trust, accountability and communication. The tone is playful and the dialogue is comedic, I guess it kinda tackles the idea of how we interpret others' stories and how we decide who we want to believe.
 
 GAME DESIGN
 Yvette:
@@ -33,17 +41,21 @@ In short:
 - inventory and evidence systems
 
 NARRATIVE
-Discuss the narrative elements of your game and how you plan to develop these in
-the final project.
+Discuss the narrative elements of your game and how you plan to develop these in the final project.
+
+//idk what to write here mary u can add smth here maybe
 
 AESTHETIC
-Discuss your aesthetic approach and the inspirations you drew from. Upload images
-to your repository and point me to the relevant directory for these, and discuss
+Discuss your aesthetic approach and the inspirations you drew from. Upload images to your repository and point me to the relevant directory for these, and discuss
 the choices you made.
 
+Yvette: When I was making the tiles (walls, door, bookshelves, floor, and books, toy etc) I envisioned a cozy library, a bit nostalgic with earthy tones. I like the idea of keeping the designs simple with basic shapes and flat color blocks. In retrospect after designing I think I took some inspiration from the Minecraft library, especially with the wooden rustic aesthetic I originally had in mind? Assets can be found in the /Tiles folder
+
+// mary again
+
 ANYTHING YOU'D ADD?
-Would you make changes if you had a few more weeks? Or what about if you had a 
-full studio behind you? What ideas would you like to implement if you had more
-technical knowledge?
+Would you make changes if you had a few more weeks? Or what about if you had a full studio behind you? What ideas would you like to implement if you had more technical knowledge?
 
 Yvette: I think exploring the multiple endings concept further would have been really interesting. A full quest log, maybe more rooms were you can explore more things. Sprite animations would've made the game look a lot nicer, and minigames (like sorting books, finding hidden objects) also would have been fun to try out. An in-game timer to add pressure to the player would've been something else to add as well, alongside music and sound effects.
+Some text effects and more polished UI would have been nicer.
+There's a weird issue with the canvas being slightly cut off which I'd been struggling to figure out where it came from for a while now, so I would have fixed that too if we had a bigger group/more ppl working on the programming :)
