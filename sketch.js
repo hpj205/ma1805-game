@@ -323,7 +323,6 @@ class Game {
               "Teacher: Ma’am?",
               "Librarian: *Grumpily* What is it now?",
               "Teacher: Can I ask you a few questions abput what you saw happen?",
-<<<<<<< HEAD
               "Librarian: YOU CALLIN’ ME A LIAR?!?!",
               "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
               "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
@@ -335,19 +334,6 @@ class Game {
               //ADDS EVIDENCE: No one was near the librarian's desk when the crime was commited 
             accuseGuilty: ["You cannot accuse the Librarian"],
             accuseInnocent: ["You cannot accuse the Librarian"],
-=======
-              "",
-              " Librarian: YOU CALLIN’ ME A LIAR?!?!",
-              "Teacher: N-no! I Just wanted to know a few more details about the kid you saw stealing so I can find the books!",
-              "Librarian: Ugh, fine. I’ll say it again, I didn’t quite see what exactly the kid looked like, my glasses fell off so they were quite blurry.",
-              "BUT I KNOW I saw with my two own eyes from across the library!",
-              "Teacher: So, the culprit wasn’t anywhere near you?",
-              "Librarian: Yes, the only time anyone came near my desk was near the beginning of this class trip when that girl sitting at that table checked out that book she’s still currently reading.",
-              // ADD EVIDENCE
-            ],
-            accuseGuilty: ["You can't accuse Librarian."],
-            accuseInnocent: ["You can't accuse Librarian."],
->>>>>>> 30ee57d626101564d9d8e4476e19231b3f6cf408
           },
           libNpc
         ),
@@ -388,7 +374,6 @@ class Game {
               "Teacher: I know you wanted to help but doing something wrong won’t make it become right",
               "Derek: Ok, I’m sorry",
               "Teacher: It’s alright as long as you know",
-<<<<<<< HEAD
             ],
             // This Alows the game won screen to appear
             
@@ -403,10 +388,6 @@ class Game {
               //"Librarian: To be honest he’s right, I should have tasked him to find the books not you",
               //"Teacher: SHUT UP! BOTH OF YOU",
             //],
-=======
-              "GAME OVER",
-            ],
->>>>>>> 30ee57d626101564d9d8e4476e19231b3f6cf408
           },
           derekNpc,
           true // derek is guiLTY
