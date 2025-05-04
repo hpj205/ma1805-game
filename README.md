@@ -9,8 +9,16 @@ OVERVIEW OF GAME
 Think of this like an introduction to your game. What is your game about? What are its key mechanics? What are its main narrative
 ideas and themes? What aesthetic choics did you make. 
 
+<<<<<<< HEAD
 Mary:
 Our game is a short puzzle-based mystery game set in a library, where the player character, a teacher has been tasked by the head librarian to find missing books and find out if any of their students have stolen any of them. The player would explore the library, talk with the NPCs, gathering evidence to use during interrogations, and traverse the library to find the remaining missing books, thus allowing the teacher to make their deductions to pin the culprit.
+=======
+Yvette: It's a short mystery game where you play as a substitute teacher trying to solve the case of a missing library book. It takes place in two rooms, the main library and the children's library. The player  has to explore, speak to NPCs and make deductions based on the evidence gathered.
+
+Key mechanics are tile based movement, collision detection, NPC interaction thru key press (1,2,3 for talk, alibi, accuse), and a simple inventory/evidence system, and game states. 
+Narratively its based around observation, honesty and trust. 
+Visually, it uses hand-drawn pixel art inspired by old RPGMaker games :)
+>>>>>>> 89539af53f325a47c5edb90b73bade9107b26b4e
 
 INDIVIDUAL CONTRIBUTIONS
 
@@ -28,8 +36,12 @@ Artistically, I practised creating pixel art and I also learned how much visual 
 THEMES
 A sentence or two describing the major themes, tone, and ideas of your game.
 
+<<<<<<< HEAD
 Mary:
 The major theme we had in mind for our game was player-based logic, allowing the player to use the evidence they collected (both the characters whereabouts, and the remaining books), to draw their own conclusions on who the culprit is.
+=======
+Yvette: The game explores ideas of trust, accountability and communication. The tone is playful and the dialogue is comedic, I guess it kinda tackles the idea of how we interpret others' stories and how we decide who we want to believe.
+>>>>>>> 89539af53f325a47c5edb90b73bade9107b26b4e
 
 GAME DESIGN
 Yvette:
@@ -44,17 +56,18 @@ In short:
 - inventory and evidence systems
 
 NARRATIVE
-Discuss the narrative elements of your game and how you plan to develop these in
-the final project.
+Discuss the narrative elements of your game and how you plan to develop these in the final project.
+
+//idk what to write here mary u can add smth here maybe
 
 Mary:
 The main story is that the player plays a teacher who acts as the chaperone for their class's field trip to the library. However in the opening scene, they get confronted by the librarian who, after noticing that many books are missing, briefly witnesses one of the teacher's students stealing a book. So the librarian tasks the teacher with finding the missing books while also figuring out which one of their students stole the book. 
 
 AESTHETIC
-Discuss your aesthetic approach and the inspirations you drew from. Upload images
-to your repository and point me to the relevant directory for these, and discuss
+Discuss your aesthetic approach and the inspirations you drew from. Upload images to your repository and point me to the relevant directory for these, and discuss
 the choices you made.
 
+<<<<<<< HEAD
 Mary:
 I have always had a love for mystery and puzzle games, so there have been many pieces of media that inspired me to create the concept for the game and script. Some of my main inspirations for the gameplay have been many of the point-and-click puzzle games made by LucasArts in the 80s and 90s, such as Sam and Max and Grim Fandango. Another one of my main inspirations was the game Cluedo (Also known as Clue). The game helped fuelled my original main idea for the game, being a deduction-based mystery game with multiple endings. While we later on could not fully implement the multiple endings feature to the game and had to scrap it, Cluedo still ended up being a huge inspiration in the final product, as the evidence lists slightly still took inspiration from the board game, with the player cross-referencing the evidence they recieved from the suspects' alibis and figuring out which suspect might stole what book based on their interests to solve the mystery.
 
@@ -67,3 +80,15 @@ Yvette: I think exploring the multiple endings concept further would have been r
 
 Mary:
 Like as Yvette mentioned above, it would have been really cool if we could have implemented our multiple endings idea, but unfortunately, we didn't have enough time to figure out how we could fully implement it to the code. Personally, I would have liked it so that there could have been longer dialogue between the player and the NPCs. For example: in one of my original drafts for the script, Josh and Amalia, would have mini scenes together when the player tries to talk to either of them, with both accusing the other of stealing the books, making it clear there was a rivalry between the two of them.
+=======
+Yvette: When I was making the tiles (walls, door, bookshelves, floor, and books, toy etc) I envisioned a cozy library, a bit nostalgic with earthy tones. I like the idea of keeping the designs simple with basic shapes and flat color blocks. In retrospect after designing I think I took some inspiration from the Minecraft library, especially with the wooden rustic aesthetic I originally had in mind? Assets can be found in the /Tiles folder
+
+// mary again
+
+ANYTHING YOU'D ADD?
+Would you make changes if you had a few more weeks? Or what about if you had a full studio behind you? What ideas would you like to implement if you had more technical knowledge?
+
+Yvette: I think exploring the multiple endings concept further would have been really interesting. A full quest log, maybe more rooms were you can explore more things. Sprite animations would've made the game look a lot nicer, and minigames (like sorting books, finding hidden objects) also would have been fun to try out. An in-game timer to add pressure to the player would've been something else to add as well, alongside music and sound effects.
+Some text effects and more polished UI would have been nicer.
+There's a weird issue with the canvas being slightly cut off which I'd been struggling to figure out where it came from for a while now, so I would have fixed that too if we had a bigger group/more ppl working on the programming :)
+>>>>>>> 89539af53f325a47c5edb90b73bade9107b26b4e

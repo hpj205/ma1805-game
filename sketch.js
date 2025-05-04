@@ -21,8 +21,8 @@ let amaliaNpc, cassieNpc, derekNpc, joshNpc, libNpc, rosalynNpc, teacherNpc;
 let currentNPC = null;
 let dialogueType = "";
 let dialogueIndex = 0;
-let playAgainButton;
-let startButton, controlsButton, backButton;
+
+let startButton, controlsButton, backButton, playAgainButton;
 let gameState = "title"; // game will start w title page
 let teacher, librarian;
 let otherNPCs = []; //hold students
@@ -98,11 +98,16 @@ function preload() {
   libNpc = loadImage("characters/Librarian.png");
   rosalynNpc = loadImage("characters/Rosalyn.png");
   teacherNpc = loadImage("characters/Teacher.png");
+
+  // buttons
+  startButton = loadImage("buttons/Start Game Button 1.png");
+  playAgainButton = loadImage("buttons/Play Again Button 1.png");
+  inventoryButton = loadImage("buttons/Book List button.png");
 }
 
 //SET UP
 function setup() {
-  cnv = createCanvas(700, 500);
+  cnv = createCanvas(tilesX * tileSize, tilesY * tileSize);
   cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
   gameFont = "monospace";
   textFont(gameFont);
@@ -110,8 +115,8 @@ function setup() {
   game.setup();
 
   //start button
-  startButton = createButton("start game");
-  startButton.position(width / 2 - startButton.width / 2, height / 2 + 100);
+  startButton = createImg("buttons/Start Game Button 1.png");
+  startButton.position(800, 400);
   startButton.mousePressed(() => {
     gameState = "dialogue";
     startButton.hide();
@@ -123,7 +128,7 @@ function setup() {
   //controls like deleuze
 
   controlsButton = createButton("controls");
-  controlsButton.position(width / 2 - controlsButton.width / 2 + 100, height / 2 + 100);
+  controlsButton.position(900, 400);
   controlsButton.mousePressed(() => {
     gameState = "controls";
     startButton.hide();
@@ -144,9 +149,11 @@ function setup() {
 
 //DRAW FUNCTION
 function draw() {
-  background(220); // Clear each frame
-
-  if (gameState === "title") {
+  clear(); // let me be clear
+  // no color  behind the tiles
+  for (let y = 0; y < tilesY; y++) {
+    for (let x = 0; x < tilesX; x++) {
+   if (gameState === "title") {
     drawTitleScreen();
   } else if (gameState === "controls") {
     drawControlsScreen();
@@ -159,17 +166,21 @@ function draw() {
     if (gameState === "dialogue") {
       game.display();
       if (gameState === "dialogue") drawDialogue();
-    }
+    }}
   }
-}
+}}
+//title scrn function
 function drawTitleScreen() {
+  background(220);
   textAlign(CENTER);
   textSize(40);
   fill(50);
   text("Library Theft", width / 2, height / 3);
 }
 
+//controls scrn function
 function drawControlsScreen() {
+  background(220);
   textAlign(LEFT);
   textSize(20);
   fill(0);
@@ -181,6 +192,7 @@ function drawControlsScreen() {
   text("- Use mouse for UI buttons", 40, 230);
 }
 
+//draw dialogue box n text
 function drawDialogue() {
   // dialogue box
   fill(255);
@@ -189,7 +201,7 @@ function drawDialogue() {
   // speaker name
   fill(0);
   textSize(20);
-  text(dialogue[currentLine].speaker + ":", 70, 430);
+  text(dialogue[currentLine].speaker + ":", 120, 430);
 
   // dialogue text
   textSize(16);
@@ -207,8 +219,8 @@ function drawGameOverScreen() {
 
   // restart button
   if (!playAgainButton) {
-    playAgainButton = createButton("Play Again");
-    playAgainButton.position(width / 2 - 80, height / 2 + 200);
+    playAgainButton = createImg("buttons/Play Again Button 1.png");
+    playAgainButton.position(300, 300);
     playAgainButton.mousePressed(resetGame);
   }
   playAgainButton.show();
@@ -243,11 +255,11 @@ function keyPressed() {
     }
   }
   if (game.activeNPC && ["1", "2", "3"].includes(key)) {
-    game.activeNPC.handleDialogue(key, game); // npc dialoge base on key
+    game.activeNPC.handleDialogue(key, game); // npc dialogue base on key
     return; // early return, stop key handling
   }
 
-  game.handleInput(key); // otherwise handle playr input
+  game.handleInput(key); // otherwise handle player input
 }
 
 //reset game function
@@ -285,8 +297,8 @@ class Game {
       [
         new NPC(
           "Amalia",
-          200,
-          170,
+          240,
+          150,
           {
             talk: [
               "Teacher: Amalia, some of the books have gone missing, may I know where you have been?",
@@ -539,8 +551,8 @@ class Game {
         new Book(
           "Glasses Jones and the Elusive Emerald",
           yellowBookImg,
-          5 * tileSize + tileSize / 2 + 80,
-          3 * tileSize + tileSize / 2 + 160,
+          5 * tileSize + tileSize / 2 + 180,
+          3 * tileSize + tileSize / 2 + 230,
           this
         ),
       ]
@@ -679,10 +691,12 @@ class Player {
     // move the player as long as the tile is like walkable on
     if (newX !== this.grid.x || newY !== this.grid.y) {
       let tile = room.map[newY][newX];
-      if (tile !== 1 && tile !== 2 && tile !== 4 && tile !== 5 ) { // 1s
+      if (tile !== 1 && tile !== 2 && tile !== 4 && tile !== 5) {
+        // 1s
         this.grid.set(newX, newY);
       }
-  }}
+    }
+  }
   // player pos as a vector to display rzns
   getPos() {
     return createVector(
@@ -735,14 +749,14 @@ class NPC {
       fill(0);
       textSize(14);
       textFont("monospace");
-      text("1. Talk    2. Alibi    3. Accuse", 70, height - 110);
+      text("1. Talk    2. Alibi    3. Accuse", 200, height - 110);
 
       // display NPCS last line of dialogue
       if (this.lastLine) {
         textSize(16);
         fill(0);
         textWrap(WORD);
-        text(`${this.name}: "${this.lastLine}"`, 70, height - 80, width - 140);
+        text(`${this.name}: "${this.lastLine}"`, 100, height - 80, width - 140);
       }
     }
   }
@@ -765,7 +779,8 @@ class NPC {
     if (dialogueArray.length > 0) {
       this.lastLine = dialogueArray.shift();
 
-      // ah yes, a string of messy if-statements :)
+      // ah yes, many many if-statements :)
+      // because how else would i have organize any of this :))
 
       if (
         this.name === "Amalia" &&
@@ -877,15 +892,15 @@ class UI {
   }
 
   createInventoryButton() {
-    this.inventoryButton = createButton("Books to find");
-    this.inventoryButton.position(300, 50);
+    this.inventoryButton = createImg("buttons/Book List button.png");
+    this.inventoryButton.position(650, 50);
     this.inventoryButton.mousePressed(() => this.toggleInventory());
   }
 
   //EVIDENCE BUTTON
   createEvidenceButton() {
-    this.evidenceButton = createButton("Evidence");
-    this.evidenceButton.position(500, 50);
+    this.evidenceButton = createImg("buttons/Evidence Button.png");
+    this.evidenceButton.position(850, 60);
     this.evidenceButton.mousePressed(() => this.toggleEvidence());
   }
 
@@ -908,12 +923,12 @@ class UI {
       rect(50, 50, 460, 150, 10);
       fill(0);
       textSize(16);
-      text("Inventory:", 70, 80);
+      text("Inventory:", 100, 80);
 
       this.game.allBooks.forEach((book, i) => {
         const yPos = 100 + i * 20;
         fill(book.collected ? 169 : 0); // grey if collected
-        text("- " + book.name, 70, yPos);
+        text("- " + book.name, 250, yPos);
       });
 
       if (this.showEvidence) {
@@ -921,13 +936,13 @@ class UI {
         rect(400, 50, 300, 150, 10);
         fill(0);
         textSize(16);
-        text("Evidence Bank:", 420, 80);
+        text("Evidence Bank:", 520, 80);
 
         // display collected evidence
         this.game.collectedEvidence.forEach((evidence, i) => {
           const yPos = 100 + i * 20;
           fill(0);
-          text("- " + evidence, 420, yPos);
+          text("- " + evidence, 500, yPos);
         });
       }
     }
@@ -939,7 +954,7 @@ class UI {
       fill(0);
       textSize(14);
       textFont("monospace");
-      text(this.message, 70, height - 30);
+      text(this.message, 270, height - 30);
     }
   }
 }
@@ -986,7 +1001,7 @@ class Evidence {
     const idx = parseInt(key) - 1;
 
     if (idx >= 0 && idx < this.dialogues.length) {
-      // show dialoge n evidence
+      // show dialogue n evidence
       this.lastLine = this.dialogues[idx];
       this.collect(game);
 
